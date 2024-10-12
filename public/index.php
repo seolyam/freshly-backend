@@ -6,12 +6,9 @@ use Slim\Factory\AppFactory;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 require __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/database.php';  // Include your database configuration
+require_once __DIR__ . '/../src/database.php';  // Adjusted path to database.php
 
 $app = AppFactory::create();
-
-// Use the port from the environment variable (default to 8080 if not set)
-$port = getenv('PORT') ?: 8080;
 
 // Define a simple route to test database connection
 $app->get('/test-db', function (Request $request, Response $response, $args): Response {
@@ -25,5 +22,12 @@ $app->get('/test-db', function (Request $request, Response $response, $args): Re
     return $response;
 });
 
-// Run the application on 0.0.0.0 to bind to all available interfaces and use the provided port
-$app->run('0.0.0.0', $port);
+$app->get('/', function (Request $request, Response $response, $args): Response {
+    $response->getBody()->write("Welcome to the Freshly Backend API!");
+    return $response;
+});
+// Add Error Middleware
+$app->addErrorMiddleware(true, true, true);
+
+// Run the application
+$app->run();
