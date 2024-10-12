@@ -1,0 +1,21 @@
+{
+  "name": "lhiam/freshly-backend",
+  "description": "\u0016A backend server for the Freshly mobile app.",
+  "version": "1.0.0",
+  "autoload": {
+    "psr-4": {
+      "Lhiam\\FreshlyBackend\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "seolyam",
+      "email": "leeyam.dev@gmail.com"
+    }
+  ],
+  "require": {
+    "slim/slim": "^4.14",
+    "illuminate/database": "^11.27",
+    "vlucas/phpdotenv": "^5.6"
+  }
+}
