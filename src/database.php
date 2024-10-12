@@ -8,10 +8,10 @@ $capsule = new Capsule;
 
 $capsule->addConnection([
     'driver'    => 'mysql',
-    'host'      => getenv('MYSQLHOST'),
-    'database'  => getenv('MYSQLDATABASE'),
-    'username'  => getenv('MYSQLUSER'),
-    'password'  => getenv('MYSQLPASSWORD'),
+    'host'      => getenv('mysql.railway.internal'),
+    'database'  => getenv('railway'),
+    'username'  => getenv('root'),
+    'password'  => getenv('jCGZKglipiSLQCvwagVpVlZoELtdzKaO'),
     'charset'   => 'utf8',
     'collation' => 'utf8_unicode_ci',
     'prefix'    => '',
