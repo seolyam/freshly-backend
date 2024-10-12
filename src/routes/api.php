@@ -1,16 +1,5 @@
-<?php
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Factory\AppFactory;
-
-require __DIR__ . '/../vendor/autoload.php';
-
-$app = AppFactory::create();
-
-$app->get('/hello', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello, World!");
+$app->get('/test-db', function (Request $request, Response $response, $args) {
+    $users = Capsule::table('products')->get(); // Just to see if it fetches data
+    $response->getBody()->write($users);
     return $response;
 });
-
-// Run Slim App
-$app->run();
