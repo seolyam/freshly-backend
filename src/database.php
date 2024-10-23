@@ -17,12 +17,12 @@ if (file_exists(__DIR__ . '/../.env')) {
     $dotenv->load();
 }
 
-// Retrieve environment variables
-$host = $_ENV['MYSQLHOST'] ?? $_SERVER['MYSQLHOST'] ?? null;
-$database = $_ENV['MYSQLDATABASE'] ?? $_SERVER['MYSQLDATABASE'] ?? null;
-$port = $_ENV['MYSQLPORT'] ?? $_SERVER['MYSQLPORT'] ?? null;
-$username = $_ENV['MYSQLUSER'] ?? $_SERVER['MYSQLUSER'] ?? null;
-$password = $_ENV['MYSQLPASSWORD'] ?? $_SERVER['MYSQLPASSWORD'] ?? null;
+$host = $_ENV['MYSQLHOST'] ?? $_ENV['MYSQL_HOST'] ?? $_SERVER['MYSQLHOST'] ?? $_SERVER['MYSQL_HOST'] ?? null;
+$database = $_ENV['MYSQLDATABASE'] ?? $_ENV['MYSQL_DATABASE'] ?? $_SERVER['MYSQLDATABASE'] ?? $_SERVER['MYSQL_DATABASE'] ?? null;
+$port = $_ENV['MYSQLPORT'] ?? $_ENV['MYSQL_PORT'] ?? $_SERVER['MYSQLPORT'] ?? $_SERVER['MYSQL_PORT'] ?? '3306';
+$username = $_ENV['MYSQLUSER'] ?? $_ENV['MYSQL_USER'] ?? $_SERVER['MYSQLUSER'] ?? $_SERVER['MYSQL_USER'] ?? null;
+$password = $_ENV['MYSQLPASSWORD'] ?? $_ENV['MYSQL_PASSWORD'] ?? $_SERVER['MYSQLPASSWORD'] ?? $_SERVER['MYSQL_PASSWORD'] ?? null;
+
 
 try {
     // Set DSN (Data Source Name)
