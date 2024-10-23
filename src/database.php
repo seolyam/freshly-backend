@@ -1,26 +1,50 @@
 <?php
+// src/database.php
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+require_once __DIR__ . '/../vendor/autoload.php';
 
+use Dotenv\Dotenv;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+// Initialize Logger
+$log = new Logger('freshly_logger');
+$log->pushHandler(new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG));
+
+// Load environment variables
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+}
+
+// Retrieve environment variables
 $host = getenv('MYSQLHOST');
 $port = getenv('MYSQLPORT');
 $database = getenv('MYSQLDATABASE');
 $username = getenv('MYSQLUSER');
 $password = getenv('MYSQLPASSWORD');
 
-$capsule = new Capsule;
+try {
+    // Set DSN (Data Source Name)
+    $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8";
 
-$capsule->addConnection([
-    'driver'    => 'mysql',
-    'host'      => $host,
-    'port'      => $port,
-    'database'  => $database,
-    'username'  => $username,
-    'password'  => $password,
-    'charset'   => 'utf8',
-    'collation' => 'utf8_unicode_ci',
-    'prefix'    => '',
-]);
+    // Create a PDO instance
+    $pdo = new PDO($dsn, $username, $password);
 
-$capsule->setAsGlobal();
-$capsule->bootEloquent();
+    // Set PDO attributes for error handling and fetch mode
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    // Log successful connection
+    $log->info('Database connection successful.');
+
+    // Return the PDO instance
+    return $pdo;
+
+} catch (PDOException $e) {
+    // Log the error
+    $log->error('Connection failed: ' . $e->getMessage());
+    // Terminate the script with a generic message
+    die('Database connection failed.');
+}
+?>

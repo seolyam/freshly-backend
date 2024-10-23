@@ -47,6 +47,10 @@ class ComposerStaticInit881be57b745429b03dc1c9f98aee6225
             'Psr\\Clock\\' => 10,
             'PhpOption\\' => 10,
         ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
+        ),
         'L' => 
         array (
             'Lhiam\\FreshlyBackend\\' => 21,
@@ -153,6 +157,10 @@ class ComposerStaticInit881be57b745429b03dc1c9f98aee6225
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'Lhiam\\FreshlyBackend\\' => 
         array (

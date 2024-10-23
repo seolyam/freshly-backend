@@ -1,0 +1,18 @@
+# Enable the Rewrite Engine
+
+RewriteEngine On
+
+# Set the RewriteBase to the public directory path
+
+# Adjust '/freshly-backend/public/' if your project is in a different subdirectory
+
+RewriteBase /freshly-backend/public/
+
+# Conditions to check if the requested file or directory exists
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirect all other requests to index.php
+
+RewriteRule ^ index.php [QSA,L]
