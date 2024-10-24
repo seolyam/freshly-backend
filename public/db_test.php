@@ -3,7 +3,6 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Dotenv\Dotenv;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
@@ -18,27 +17,38 @@ $log->pushHandler(new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG)
 
 // Load environment variables
 if (file_exists(__DIR__ . '/../.env')) {
-    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
     $dotenv->load();
 }
 
-$host = $_ENV['MYSQLHOST'] ?? $_SERVER['MYSQLHOST'] ?? null;
-$database = $_ENV['MYSQLDATABASE'] ?? $_SERVER['MYSQLDATABASE'] ?? null;
-$port = $_ENV['MYSQLPORT'] ?? $_SERVER['MYSQLPORT'] ?? null;
-$username = $_ENV['MYSQLUSER'] ?? $_SERVER['MYSQLUSER'] ?? null;
-$password = $_ENV['MYSQLPASSWORD'] ?? $_SERVER['MYSQLPASSWORD'] ?? null;
+// Retrieve environment variables
+$host = getenv('MYSQL_URL') ?: getenv('DATABASE_URL'); // Ensure this matches your Railway variable
+// Since MYSQL_URL is a full connection string, we need to parse it as done in database.php
+$databaseUrl = getenv('MYSQL_URL') ?: getenv('DATABASE_URL');
 
-
-// After loading the environment variables
 echo '<pre>';
 print_r($_ENV);
 echo '</pre>';
 
-
-
 try {
+    if ($databaseUrl) {
+        $parsedUrl = parse_url($databaseUrl);
+
+        $host = $parsedUrl['host'];
+        $port = $parsedUrl['port'] ?? 3306;
+        $database = ltrim($parsedUrl['path'], '/');
+        $username = $parsedUrl['user'];
+        $password = $parsedUrl['pass'];
+    } else {
+        $host = getenv('MYSQLHOST') ?: '127.0.0.1';
+        $port = getenv('MYSQLPORT') ?: '3306';
+        $database = getenv('MYSQLDATABASE') ?: 'railway';
+        $username = getenv('MYSQLUSER') ?: 'root';
+        $password = getenv('MYSQLPASSWORD') ?: '';
+    }
+
     // Set DSN (Data Source Name)
-    $dsn = "mysql:host=$host;port=$port;dbname=$database;charset=utf8";
+    $dsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8";
 
     // Create a PDO instance
     $pdo = new PDO($dsn, $username, $password);
