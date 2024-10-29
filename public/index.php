@@ -7,6 +7,11 @@ use App\TursoClient;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use Slim\Middleware\BodyParsingMiddleware;
+use Dotenv\Dotenv;
+
+// Load environment variables
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
 // Create App
 $app = AppFactory::create();
@@ -26,13 +31,11 @@ $userController = new UserController($tursoClient);
 $app->post('/register', [$userController, 'register']);
 $app->post('/login', [$userController, 'login']);
 
-// Protected route example
-$app->get('/protected', function ($request, $response, $args) {
-    $user = $request->getAttribute('user');
-    $response->getBody()->write("Hello, " . $user['uname']);
+// Debug Route
+$app->get('/test', function ($request, $response, $args) {
+    $response->getBody()->write("Route test successful!");
     return $response->withHeader('Content-Type', 'text/plain');
-})->add(new AuthMiddleware());
-$app->get('/profile', [$userController, 'getProfile'])->add(new AuthMiddleware());
+});
 
 // Run app
 $app->run();
