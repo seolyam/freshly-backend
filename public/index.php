@@ -7,11 +7,12 @@ use App\TursoClient;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use Slim\Middleware\BodyParsingMiddleware;
-use Dotenv\Dotenv;
 
-// Load environment variables
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+// Load environment variables only if not in Railway production
+if (!getenv('RAILWAY_ENVIRONMENT')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+}
 
 // Create App
 $app = AppFactory::create();
@@ -20,8 +21,8 @@ $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 
 // Set up database connection
-$databaseUrl = $_ENV['TURSO_DB_URL'] ?? getenv('TURSO_DB_URL');
-$authToken = $_ENV['TURSO_AUTH_TOKEN'] ?? getenv('TURSO_AUTH_TOKEN');
+$databaseUrl = getenv('TURSO_DB_URL') ?: $_ENV['TURSO_DB_URL'];
+$authToken = getenv('TURSO_AUTH_TOKEN') ?: $_ENV['TURSO_AUTH_TOKEN'];
 $tursoClient = new TursoClient($databaseUrl, $authToken);
 
 // Instantiate controllers
