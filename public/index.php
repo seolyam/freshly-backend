@@ -31,12 +31,20 @@ $userController = new UserController($tursoClient);
 // Routes
 $app->post('/register', [$userController, 'register']);
 $app->post('/login', [$userController, 'login']);
+$app->get('/profile', [$userController, 'getProfile'])->add(new AuthMiddleware());
+$app->post('/profile', [$userController, 'updateProfile'])->add(new AuthMiddleware());
 
 // Debug Route
-$app->get('/test', function ($request, $response, $args) {
-    $response->getBody()->write("Route test successful!");
+$app->get('/test-db', function ($request, $response, $args) use ($tursoClient) {
+    try {
+        $result = $tursoClient->execute("SELECT 1;");
+        $response->getBody()->write("Database connection successful!");
+    } catch (\Exception $e) {
+        $response->getBody()->write("Database connection failed: " . $e->getMessage());
+    }
     return $response->withHeader('Content-Type', 'text/plain');
 });
+
 
 // Run app
 $app->run();
