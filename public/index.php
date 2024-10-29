@@ -3,25 +3,20 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
-use Dotenv\Dotenv;
 use App\TursoClient;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
-use Slim\Middleware\BodyParsingMiddleware; // Add this line
-
-// Load environment variables
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+use Slim\Middleware\BodyParsingMiddleware;
 
 // Create App
 $app = AppFactory::create();
 
 // Add the Body Parsing Middleware
-$app->addBodyParsingMiddleware(); // Add this line
+$app->addBodyParsingMiddleware();
 
 // Set up database connection
-$databaseUrl = $_ENV['TURSO_DB_URL'] ?? null;
-$authToken = $_ENV['TURSO_AUTH_TOKEN'] ?? null;
+$databaseUrl = $_ENV['TURSO_DB_URL'] ?? getenv('TURSO_DB_URL');
+$authToken = $_ENV['TURSO_AUTH_TOKEN'] ?? getenv('TURSO_AUTH_TOKEN');
 $tursoClient = new TursoClient($databaseUrl, $authToken);
 
 // Instantiate controllers
