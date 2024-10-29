@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "autoload": {
     "psr-4": {
-      "Lhiam\\FreshlyBackend\\": "src/"
+      "App\\": "src/"
     }
   },
   "scripts": {
@@ -21,6 +21,10 @@
     "illuminate/database": "^11.27",
     "monolog/monolog": "^2.0",
     "slim/psr7": "^1.7",
-    "vlucas/phpdotenv": "^5.6"
+    "vlucas/phpdotenv": "^5.6",
+    "guzzlehttp/guzzle": "^7.9",
+    "lcobucci/jwt": "^5.4",
+    "lcobucci/clock": "^3.3",
+    "psr/clock": "^1.0"
   }
 }

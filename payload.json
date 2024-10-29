@@ -1,0 +1,7 @@
+{
+  "statements": [
+    {
+      "stmt": "SELECT * FROM products;"
+    }
+  ]
+}

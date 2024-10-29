@@ -10,40 +10,44 @@ use Monolog\Handler\StreamHandler;
 $log = new Logger('freshly_logger');
 $log->pushHandler(new StreamHandler(__DIR__ . '/../logs/app.log', Logger::DEBUG));
 
-// Load environment variables (only in local environment)
+// Load environment variables
 if (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
     $dotenv->load();
 }
 
-// Get the DATABASE_URL environment variable
-$databaseUrl = getenv('MYSQL_URL') ?: getenv('DATABASE_URL');
+// Get the TURSODB_URL environment variable
+$databaseUrl = getenv('TURSODB_URL');
 
-// Fallback to individual variables if DATABASE_URL is not set
 if ($databaseUrl) {
-    // Parse the URL
+    // Parse the libSQL URL
     $parsedUrl = parse_url($databaseUrl);
 
-    $host = $parsedUrl['host'];
-    $port = $parsedUrl['port'] ?? 3306; // Default to 3306 if port is not set
-    $database = ltrim($parsedUrl['path'], '/');
-    $username = $parsedUrl['user'];
-    $password = $parsedUrl['pass'];
+    if ($parsedUrl === false) {
+        $log->error('Invalid TURSODB_URL format.');
+        die('Database connection failed.');
+    }
+
+    $scheme = $parsedUrl['scheme'] ?? '';
+    $host = $parsedUrl['host'] ?? '';
+    $port = $parsedUrl['port'] ?? 5432; // Default PostgreSQL port
+    $user = $parsedUrl['user'] ?? '';
+    $pass = $parsedUrl['pass'] ?? '';
+    $path = ltrim($parsedUrl['path'] ?? '', '/');
+
+    // Construct PostgreSQL DSN
+    $dsn = "pgsql:host={$host};port={$port};dbname={$path};";
+
 } else {
-    // Use individual environment variables
-    $host = getenv('MYSQLHOST') ?: '127.0.0.1';
-    $port = getenv('MYSQLPORT') ?: '3306';
-    $database = getenv('MYSQLDATABASE') ?: 'railway';
-    $username = getenv('MYSQLUSER') ?: 'root';
-    $password = getenv('MYSQLPASSWORD') ?: '';
+    // Fallback for local development (if applicable)
+    $dsn = "pgsql:host=localhost;port=5432;dbname=freshly;";
+    $user = 'your_local_username';
+    $pass = 'your_local_password';
 }
 
-// Set DSN (Data Source Name)
-$dsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8";
-
 try {
-    // Create a PDO instance
-    $pdo = new PDO($dsn, $username, $password);
+    // Create a PDO instance using PostgreSQL driver
+    $pdo = new PDO($dsn, $user, $pass);
 
     // Set PDO attributes for error handling and fetch mode
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

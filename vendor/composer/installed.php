@@ -55,6 +55,33 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'guzzlehttp/guzzle' => array(
+            'pretty_version' => '7.9.2',
+            'version' => '7.9.2.0',
+            'reference' => 'd281ed313b989f213357e3be1a179f02196ac99b',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../guzzlehttp/guzzle',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'guzzlehttp/promises' => array(
+            'pretty_version' => '2.0.4',
+            'version' => '2.0.4.0',
+            'reference' => 'f9c436286ab2892c7db7be8c8da4ef61ccf7b455',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../guzzlehttp/promises',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'guzzlehttp/psr7' => array(
+            'pretty_version' => '2.7.0',
+            'version' => '2.7.0.0',
+            'reference' => 'a70f5c95fb43bc83f07c9c948baa0dc1829bf201',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../guzzlehttp/psr7',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'illuminate/collections' => array(
             'pretty_version' => 'v11.28.1',
             'version' => '11.28.1.0',
@@ -115,6 +142,24 @@
             'reference' => 'bd0983d4a22eccde1773809d4897bb533c3f26fd',
             'type' => 'library',
             'install_path' => __DIR__ . '/../illuminate/support',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'lcobucci/clock' => array(
+            'pretty_version' => '3.3.1',
+            'version' => '3.3.1.0',
+            'reference' => 'db3713a61addfffd615b79bf0bc22f0ccc61b86b',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../lcobucci/clock',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'lcobucci/jwt' => array(
+            'pretty_version' => '5.4.0',
+            'version' => '5.4.0.0',
+            'reference' => 'aac4fd512681fd5cb4b77d2105ab7ec700c72051',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../lcobucci/jwt',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -193,6 +238,21 @@
                 0 => '1.1|2.0',
             ),
         ),
+        'psr/http-client' => array(
+            'pretty_version' => '1.0.3',
+            'version' => '1.0.3.0',
+            'reference' => 'bb5906edc1c324c9a05aa0873d40117941e5fa90',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/http-client',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'psr/http-client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.0',
+            ),
+        ),
         'psr/http-factory' => array(
             'pretty_version' => '1.1.0',
             'version' => '1.1.0.0',
@@ -205,7 +265,8 @@
         'psr/http-factory-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '^1.0',
+                0 => '1.0',
+                1 => '^1.0',
             ),
         ),
         'psr/http-message' => array(
@@ -220,7 +281,8 @@
         'psr/http-message-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '^1.0 || ^2.0',
+                0 => '1.0',
+                1 => '^1.0 || ^2.0',
             ),
         ),
         'psr/http-server-handler' => array(
@@ -304,6 +366,15 @@
             'reference' => '3dfc8b084853586de51dd1441c6242c76a28cbe7',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/clock',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/deprecation-contracts' => array(
+            'pretty_version' => 'v3.5.0',
+            'version' => '3.5.0.0',
+            'reference' => '0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/deprecation-contracts',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
