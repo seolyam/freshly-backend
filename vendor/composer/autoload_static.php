@@ -56,6 +56,8 @@ class ComposerStaticInit881be57b745429b03dc1c9f98aee6225
         ),
         'L' => 
         array (
+            'Libsql\\Tests\\' => 13,
+            'Libsql\\' => 7,
             'Lcobucci\\JWT\\' => 13,
             'Lcobucci\\Clock\\' => 15,
         ),
@@ -177,6 +179,14 @@ class ComposerStaticInit881be57b745429b03dc1c9f98aee6225
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
+        'Libsql\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/turso/libsql/tests',
+        ),
+        'Libsql\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/turso/libsql/src',
+        ),
         'Lcobucci\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/lcobucci/jwt/src',
@@ -266,6 +276,16 @@ class ComposerStaticInit881be57b745429b03dc1c9f98aee6225
         'DateMalformedStringException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateMalformedStringException.php',
         'DateObjectError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateObjectError.php',
         'DateRangeError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateRangeError.php',
+        'Libsql\\Blob' => __DIR__ . '/..' . '/turso/libsql/src/Blob.php',
+        'Libsql\\CharBox' => __DIR__ . '/..' . '/turso/libsql/src/CharBox.php',
+        'Libsql\\Connection' => __DIR__ . '/..' . '/turso/libsql/src/Connection.php',
+        'Libsql\\Database' => __DIR__ . '/..' . '/turso/libsql/src/Database.php',
+        'Libsql\\LibsqlException' => __DIR__ . '/..' . '/turso/libsql/src/LibsqlException.php',
+        'Libsql\\Prepareable' => __DIR__ . '/..' . '/turso/libsql/src/Prepareable.php',
+        'Libsql\\Row' => __DIR__ . '/..' . '/turso/libsql/src/Row.php',
+        'Libsql\\Rows' => __DIR__ . '/..' . '/turso/libsql/src/Rows.php',
+        'Libsql\\Statement' => __DIR__ . '/..' . '/turso/libsql/src/Statement.php',
+        'Libsql\\Transaction' => __DIR__ . '/..' . '/turso/libsql/src/Transaction.php',
         'Override' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/Override.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'SQLite3Exception' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php',

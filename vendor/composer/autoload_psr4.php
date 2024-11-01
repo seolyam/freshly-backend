@@ -25,6 +25,8 @@ return array(
     'Psr\\Clock\\' => array($vendorDir . '/psr/clock/src'),
     'PhpOption\\' => array($vendorDir . '/phpoption/phpoption/src/PhpOption'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
+    'Libsql\\Tests\\' => array($vendorDir . '/turso/libsql/tests'),
+    'Libsql\\' => array($vendorDir . '/turso/libsql/src'),
     'Lcobucci\\JWT\\' => array($vendorDir . '/lcobucci/jwt/src'),
     'Lcobucci\\Clock\\' => array($vendorDir . '/lcobucci/clock/src'),
     'Illuminate\\Support\\' => array($vendorDir . '/illuminate/collections', $vendorDir . '/illuminate/conditionable', $vendorDir . '/illuminate/macroable', $vendorDir . '/illuminate/support'),

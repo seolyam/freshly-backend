@@ -6,7 +6,7 @@ use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
-use Lcobucci\JWT\Signer\Hmac\Sha256; // Correct namespace
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -18,14 +18,15 @@ class AuthMiddleware
 
     public function __construct()
     {
-        $secretKey = $_ENV['JWT_SECRET'];
+        // Fetch the secret key
+        $secretKey = $_ENV['JWT_SECRET'] ?? '';
 
         $this->jwtConfig = Configuration::forSymmetricSigner(
-            new Sha256(), // Use the correct class and namespace
+            new Sha256(),
             \Lcobucci\JWT\Signer\Key\InMemory::plainText($secretKey)
         );
 
-        // Set validation constraints
+        // Configure validation constraints
         $clock = SystemClock::fromSystemTimezone();
         $this->jwtConfig->setValidationConstraints(
             new SignedWith($this->jwtConfig->signer(), $this->jwtConfig->verificationKey()),
@@ -35,6 +36,7 @@ class AuthMiddleware
 
     public function __invoke(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        // Extract the Authorization header
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (!$authHeader) {
@@ -48,23 +50,24 @@ class AuthMiddleware
         }
 
         try {
+            // Parse and validate the token
             $token = $this->jwtConfig->parser()->parse($tokenString);
-
-            // Validate token
             $constraints = $this->jwtConfig->validationConstraints();
 
+            // Validate the token
             if (!$this->jwtConfig->validator()->validate($token, ...$constraints)) {
-                return $this->unauthorizedResponse('Invalid or expired token');
+                return $this->unauthorizedResponse('Token validation failed');
             }
 
-            // Add user info to the request attributes
+            // Extract claims and attach them to the request
             $claims = $token->claims()->all();
             $request = $request->withAttribute('user', $claims);
 
             return $handler->handle($request);
 
         } catch (\Exception $e) {
-            return $this->unauthorizedResponse('Invalid token');
+            error_log("Token validation error: " . $e->getMessage()); // Log error for debugging
+            return $this->unauthorizedResponse('Invalid or expired token');
         }
     }
 

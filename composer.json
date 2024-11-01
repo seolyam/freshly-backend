@@ -25,6 +25,7 @@
     "guzzlehttp/guzzle": "^7.9",
     "lcobucci/jwt": "^5.4",
     "lcobucci/clock": "^3.3",
-    "psr/clock": "^1.0"
+    "psr/clock": "^1.0",
+    "turso/libsql": "^0.1.1"
   }
 }

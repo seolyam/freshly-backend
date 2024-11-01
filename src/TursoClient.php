@@ -3,41 +3,42 @@
 namespace App;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 
 class TursoClient
 {
-    private Client $client;
-    private string $authToken;
+    private $client;
+    private $authToken;
 
-    public function __construct(string $databaseUrl, string $authToken)
+    public function __construct($databaseUrl, $authToken)
     {
         $this->authToken = $authToken;
+
         $this->client = new Client([
-            'base_uri' => $this->convertToHttpUrl($databaseUrl),
+            'base_uri' => preg_replace('/^libsql:\/\//', 'https://', $databaseUrl),
             'timeout'  => 30.0,
         ]);
     }
 
-    private function convertToHttpUrl(string $libsqlUrl): string
-    {
-        return preg_replace('/^libsql:\/\//', 'https://', $libsqlUrl);
-    }
-
-    public function execute(string $sql, array $params = []): array
+    public function executeQuery($sql, $params = [])
     {
         try {
             $requests = [
                 [
                     'type' => 'execute',
-                    'stmt' => ['sql' => $sql],
+                    'stmt' => [
+                        'sql' => $sql,
+                    ],
                 ],
-                ['type' => 'close']
+                [
+                    'type' => 'close',
+                ],
             ];
 
+            // Add parameters if any
             if (!empty($params)) {
-                $args = array_map(fn($param) => ['type' => 'text', 'value' => $param], $params);
-                $requests[0]['stmt']['args'] = $args;
+                $requests[0]['stmt']['args'] = array_map(function ($param) {
+                    return ['type' => 'text', 'value' => $param];
+                }, $params);
             }
 
             $response = $this->client->post('/v2/pipeline', [
@@ -48,19 +49,11 @@ class TursoClient
                 ],
             ]);
 
-            $data = json_decode($response->getBody(), true);
+            $body = $response->getBody();
+            return json_decode($body, true);
 
-            if (isset($data['error'])) {
-                throw new \Exception('TursoDB Error: ' . $data['error']);
-            }
-
-            return $data['results'][0]['rows'] ?? [];
-
-        } catch (RequestException $e) {
-            $statusCode = $e->getResponse() ? $e->getResponse()->getStatusCode() : 'N/A';
-            $reason = $e->getResponse() ? $e->getResponse()->getReasonPhrase() : $e->getMessage();
-
-            throw new \Exception("HTTP Request failed: {$statusCode} {$reason}");
+        } catch (\Exception $e) {
+            throw new \Exception("Database query failed: " . $e->getMessage());
         }
     }
 }

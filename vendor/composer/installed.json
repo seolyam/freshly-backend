@@ -2993,6 +2993,58 @@
             "install-path": "../symfony/translation-contracts"
         },
         {
+            "name": "turso/libsql",
+            "version": "v0.1.1",
+            "version_normalized": "0.1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tursodatabase/libsql-php.git",
+                "reference": "e36391f539f8cbcb2b52e77650acd50ac4c1f7a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tursodatabase/libsql-php/zipball/e36391f539f8cbcb2b52e77650acd50ac4c1f7a7",
+                "reference": "e36391f539f8cbcb2b52e77650acd50ac4c1f7a7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ffi": "*",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.64",
+                "phpunit/phpunit": "^11"
+            },
+            "time": "2024-10-25T18:57:47+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Libsql\\": "src/",
+                    "Libsql\\Tests\\": "tests/"
+                },
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Levy A.",
+                    "email": "levyddsa@gmail.com"
+                }
+            ],
+            "description": "libSQL bindings for PHP",
+            "support": {
+                "issues": "https://github.com/tursodatabase/libsql-php/issues",
+                "source": "https://github.com/tursodatabase/libsql-php/tree/v0.1.1"
+            },
+            "install-path": "../turso/libsql"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.1",
             "version_normalized": "5.6.1.0",

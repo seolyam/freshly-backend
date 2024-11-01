@@ -1012,3 +1012,76 @@ Stack trace:
 #6 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(53): Slim\App->run()
 #7 {main}
   thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/RoutingMiddleware.php on line 76
+[01-Nov-2024 05:07:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Libsql\Database::execute() in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php:42
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Handlers/Strategies/RequestResponse.php(38): App\Controllers\UserController->register(Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#1 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(363): Slim\Handlers\Strategies\RequestResponse->__invoke(Array, Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\Routing\Route->handle(Object(Slim\Psr7\Request))
+#3 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#4 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(321): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#5 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/RouteRunner.php(74): Slim\Routing\Route->run(Object(Slim\Psr7\Request))
+#6 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/BodyParsingMiddleware.php(65): Slim\Routing\RouteRunner->handle(Object(Slim\Psr7\Request))
+#7 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(129): Slim\Middleware\BodyParsingMiddleware->process(Object(Slim\Psr7\Request), Object(Slim\Routing\RouteRunner))
+#8 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Psr\Http\Server\RequestHandlerInterface@anonymous->handle(Object(Slim\Psr7\Request))
+#9 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(209): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#10 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(193): Slim\App->handle(Object(Slim\Psr7\Request))
+#11 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(45): Slim\App->run()
+#12 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php on line 42
+[01-Nov-2024 05:10:30 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Libsql\Database::executeBatch() in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php:42
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Handlers/Strategies/RequestResponse.php(38): App\Controllers\UserController->register(Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#1 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(363): Slim\Handlers\Strategies\RequestResponse->__invoke(Array, Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\Routing\Route->handle(Object(Slim\Psr7\Request))
+#3 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#4 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(321): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#5 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/RouteRunner.php(74): Slim\Routing\Route->run(Object(Slim\Psr7\Request))
+#6 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/BodyParsingMiddleware.php(65): Slim\Routing\RouteRunner->handle(Object(Slim\Psr7\Request))
+#7 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(129): Slim\Middleware\BodyParsingMiddleware->process(Object(Slim\Psr7\Request), Object(Slim\Routing\RouteRunner))
+#8 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Psr\Http\Server\RequestHandlerInterface@anonymous->handle(Object(Slim\Psr7\Request))
+#9 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(209): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#10 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(193): Slim\App->handle(Object(Slim\Psr7\Request))
+#11 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(45): Slim\App->run()
+#12 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php on line 42
+[01-Nov-2024 05:12:06 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Libsql\Database::query() in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php:43
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Handlers/Strategies/RequestResponse.php(38): App\Controllers\UserController->register(Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#1 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(363): Slim\Handlers\Strategies\RequestResponse->__invoke(Array, Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\Routing\Route->handle(Object(Slim\Psr7\Request))
+#3 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#4 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(321): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#5 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/RouteRunner.php(74): Slim\Routing\Route->run(Object(Slim\Psr7\Request))
+#6 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/BodyParsingMiddleware.php(65): Slim\Routing\RouteRunner->handle(Object(Slim\Psr7\Request))
+#7 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(129): Slim\Middleware\BodyParsingMiddleware->process(Object(Slim\Psr7\Request), Object(Slim\Routing\RouteRunner))
+#8 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Psr\Http\Server\RequestHandlerInterface@anonymous->handle(Object(Slim\Psr7\Request))
+#9 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(209): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#10 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(193): Slim\App->handle(Object(Slim\Psr7\Request))
+#11 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(45): Slim\App->run()
+#12 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php on line 43
+[01-Nov-2024 05:12:49 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Libsql\Database::prepare() in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php:41
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Handlers/Strategies/RequestResponse.php(38): App\Controllers\UserController->register(Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#1 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(363): Slim\Handlers\Strategies\RequestResponse->__invoke(Array, Object(Slim\Psr7\Request), Object(Slim\Psr7\Response), Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\Routing\Route->handle(Object(Slim\Psr7\Request))
+#3 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#4 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/Route.php(321): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#5 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/RouteRunner.php(74): Slim\Routing\Route->run(Object(Slim\Psr7\Request))
+#6 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/BodyParsingMiddleware.php(65): Slim\Routing\RouteRunner->handle(Object(Slim\Psr7\Request))
+#7 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(129): Slim\Middleware\BodyParsingMiddleware->process(Object(Slim\Psr7\Request), Object(Slim\Routing\RouteRunner))
+#8 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Psr\Http\Server\RequestHandlerInterface@anonymous->handle(Object(Slim\Psr7\Request))
+#9 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(209): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#10 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(193): Slim\App->handle(Object(Slim\Psr7\Request))
+#11 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(45): Slim\App->run()
+#12 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php on line 41
+[01-Nov-2024 05:14:53 UTC] PHP Fatal error:  Uncaught TypeError: App\Controllers\UserController::__construct(): Argument #1 ($db) must be of type App\TursoClient, Libsql\Database given, called in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 28 and defined in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php:17
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(28): App\Controllers\UserController->__construct(Object(Libsql\Database))
+#1 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php on line 17
+[01-Nov-2024 05:15:26 UTC] PHP Fatal error:  Uncaught Error: Class "App\TursoClient" not found in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 18

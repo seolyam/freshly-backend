@@ -438,6 +438,15 @@
                 0 => '2.3|3.0',
             ),
         ),
+        'turso/libsql' => array(
+            'pretty_version' => 'v0.1.1',
+            'version' => '0.1.1.0',
+            'reference' => 'e36391f539f8cbcb2b52e77650acd50ac4c1f7a7',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../turso/libsql',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'vlucas/phpdotenv' => array(
             'pretty_version' => 'v5.6.1',
             'version' => '5.6.1.0',
