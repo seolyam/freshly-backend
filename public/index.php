@@ -7,44 +7,47 @@ use App\TursoClient;
 use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use Slim\Middleware\BodyParsingMiddleware;
+use Dotenv\Dotenv;
 
-// Load environment variables only if not in Railway production
-if (!getenv('RAILWAY_ENVIRONMENT')) {
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-    $dotenv->load();
-}
+// Load environment variables explicitly for local development or any other environment
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
-// Create App
-$app = AppFactory::create();
+// Confirm environment variables are loaded by logging them
+error_log("TURSO_DB_URL: " . ($_ENV['TURSO_DB_URL'] ?? 'Not set'));
+error_log("TURSO_AUTH_TOKEN: " . ($_ENV['TURSO_AUTH_TOKEN'] ?? 'Not set'));
 
-// Add the Body Parsing Middleware
-$app->addBodyParsingMiddleware();
-
-// Set up database connection
-$databaseUrl = getenv('TURSO_DB_URL') ?: $_ENV['TURSO_DB_URL'];
-$authToken = getenv('TURSO_AUTH_TOKEN') ?: $_ENV['TURSO_AUTH_TOKEN'];
+// Initialize database connection with environment variables
+$databaseUrl = $_ENV['TURSO_DB_URL'];
+$authToken = $_ENV['TURSO_AUTH_TOKEN'];
 $tursoClient = new TursoClient($databaseUrl, $authToken);
+
+// Set up Slim App
+$app = AppFactory::create();
+$app->addBodyParsingMiddleware();
 
 // Instantiate controllers
 $userController = new UserController($tursoClient);
 
-// Routes
+// Define routes
 $app->post('/register', [$userController, 'register']);
 $app->post('/login', [$userController, 'login']);
 $app->get('/profile', [$userController, 'getProfile'])->add(new AuthMiddleware());
 $app->post('/profile', [$userController, 'updateProfile'])->add(new AuthMiddleware());
 
-// Debug Route
-$app->get('/test-db', function ($request, $response, $args) use ($tursoClient) {
-    try {
-        $result = $tursoClient->execute("SELECT 1;");
-        $response->getBody()->write("Database connection successful!");
-    } catch (\Exception $e) {
-        $response->getBody()->write("Database connection failed: " . $e->getMessage());
-    }
-    return $response->withHeader('Content-Type', 'text/plain');
+// Test route for direct database query
+$app->get('/test-user', function ($request, $response) use ($tursoClient) {
+    $user = $tursoClient->execute("SELECT * FROM users WHERE username = 'leeyam21'");
+
+    // Log the complete structure of $user for inspection
+    error_log("Full Query Result: " . print_r($user, true));
+    
+    $response->getBody()->write(json_encode($user));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 
-// Run app
+
+
+// Run the app
 $app->run();
