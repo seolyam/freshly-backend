@@ -1085,3 +1085,4 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 18
+[01-Nov-2024 05:55:24 UTC] Token validation error: [{},"getProfile"] is not resolvable

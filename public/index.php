@@ -30,6 +30,7 @@ $app->post('/login', [$userController, 'login']);
 $app->get('/profile', [$userController, 'getProfile'])->add(new AuthMiddleware());
 $app->post('/profile', [$userController, 'updateProfile'])->add(new AuthMiddleware());
 
+
 // Test route for direct database query
 $app->get('/test-user', function ($request, $response) use ($tursoClient) {
     $user = $tursoClient->executeQuery("SELECT * FROM users WHERE username = 'leeyam20'");
