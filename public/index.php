@@ -8,9 +8,13 @@ use App\Controllers\UserController;
 use App\Middleware\AuthMiddleware;
 use Dotenv\Dotenv;
 
-// Load environment variables
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+
+
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+}
+
 
 // Initialize the database connection using TursoClient
 $databaseUrl = $_ENV['TURSO_DB_URL'];
