@@ -38,10 +38,32 @@ class UserController
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-            $this->db->executeQuery($sql, [$username, $email, $hashedPassword]);
-            return $this->respondWithJson($response, ['message' => 'User registered successfully.'], 201);
+            // Use RETURNING clause to get the inserted user's id and username
+            $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?) RETURNING id, username";
+            $result = $this->db->executeQuery($sql, [$username, $email, $hashedPassword]);
+
+            if (empty($result['results'][0]['response']['result']['rows'])) {
+                return $this->respondWithJson($response, ['error' => 'Registration failed.'], 500);
+            }
+
+            $userRow = $result['results'][0]['response']['result']['rows'][0];
+            // Extract id and username from the result
+            $userId = $userRow[0]['value'];
+            $username = $userRow[1]['value'];
+
+            // Generate JWT token for the new user
+            $token = $this->generateJWT([
+                'id' => $userId,
+                'username' => $username,
+            ]);
+
+            // Return the token in the response
+            return $this->respondWithJson($response, ['token' => $token], 201);
         } catch (\Exception $e) {
+            // Handle duplicate entries or other database errors
+            if (strpos($e->getMessage(), 'UNIQUE constraint failed') !== false) {
+                return $this->respondWithJson($response, ['error' => 'Username or email already exists.'], 409);
+            }
             return $this->respondWithJson($response, ['error' => 'Registration failed.'], 500);
         }
     }
