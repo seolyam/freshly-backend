@@ -15,14 +15,14 @@ class ProductController
         $this->db = $db;
     }
 
-    // Get all products
+    
     public function getAllProducts(Request $request, Response $response, array $args): Response
     {
         try {
             $sql = 'SELECT * FROM products';
             $productResult = $this->db->executeQuery($sql);
 
-            // Parse results
+            
             $products = $productResult['results'][0]['response']['result']['rows'] ?? [];
 
             $response->getBody()->write(json_encode(['products' => $products]));
@@ -32,7 +32,7 @@ class ProductController
         }
     }
 
-    // Get a single product by ID
+    
     public function getProductById(Request $request, Response $response, array $args): Response
     {
         $productId = $args['id'] ?? null;
@@ -57,7 +57,7 @@ class ProductController
         }
     }
 
-    // Add a new product
+    
     public function createProduct(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
@@ -78,7 +78,7 @@ class ProductController
         }
     }
 
-    // Update an existing product by ID
+    
     public function updateProduct(Request $request, Response $response, array $args): Response
     {
         $productId = $args['id'] ?? null;
@@ -100,7 +100,7 @@ class ProductController
         }
     }
 
-    // Delete a product by ID
+    
     public function deleteProduct(Request $request, Response $response, array $args): Response
     {
         $productId = $args['id'] ?? null;
@@ -118,7 +118,7 @@ class ProductController
         }
     }
 
-    // Helper methods for consistent response formatting
+    
     private function successResponse(Response $response, string $message, int $status = 200): Response
     {
         $response->getBody()->write(json_encode(['message' => $message]));

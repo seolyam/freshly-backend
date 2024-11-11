@@ -18,7 +18,7 @@ class AuthMiddleware
 
     public function __construct()
     {
-        // Fetch the secret key
+        
         $secretKey = $_ENV['JWT_SECRET'] ?? '';
 
         $this->jwtConfig = Configuration::forSymmetricSigner(
@@ -26,7 +26,7 @@ class AuthMiddleware
             \Lcobucci\JWT\Signer\Key\InMemory::plainText($secretKey)
         );
 
-        // Configure validation constraints
+        
         $clock = SystemClock::fromSystemTimezone();
         $this->jwtConfig->setValidationConstraints(
             new SignedWith($this->jwtConfig->signer(), $this->jwtConfig->verificationKey()),
@@ -36,7 +36,7 @@ class AuthMiddleware
 
     public function __invoke(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // Extract the Authorization header
+        
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (!$authHeader) {
@@ -50,23 +50,23 @@ class AuthMiddleware
         }
 
         try {
-            // Parse and validate the token
+            
             $token = $this->jwtConfig->parser()->parse($tokenString);
             $constraints = $this->jwtConfig->validationConstraints();
 
-            // Validate the token
+            
             if (!$this->jwtConfig->validator()->validate($token, ...$constraints)) {
                 return $this->unauthorizedResponse('Token validation failed');
             }
 
-            // Extract claims and attach them to the request
+            
             $claims = $token->claims()->all();
             $request = $request->withAttribute('user', $claims);
 
             return $handler->handle($request);
 
         } catch (\Exception $e) {
-            error_log("Token validation error: " . $e->getMessage()); // Log error for debugging
+            error_log("Token validation error: " . $e->getMessage()); 
             return $this->unauthorizedResponse('Invalid or expired token');
         }
     }

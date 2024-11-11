@@ -2,68 +2,52 @@
 
 namespace App\Controllers;
 
+use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use App\TursoClient;
-use Lcobucci\JWT\Configuration;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
-use Lcobucci\JWT\Signer\Key\InMemory;
 
 class UserController
 {
-    private TursoClient $db;
-    private Configuration $jwtConfig;
+    private Client $client;
+    private string $apiKey;
 
-    public function __construct(TursoClient $db)
+    public function __construct()
     {
-        $this->db = $db;
-        $secretKey = $_ENV['JWT_SECRET'] ?? '';
-        $this->jwtConfig = Configuration::forSymmetricSigner(
-            new Sha256(),
-            InMemory::plainText($secretKey)
-        );
+        $this->client = new Client();
+        $this->apiKey = $_ENV['USER_API_KEY'] ?? '';
+
+        if (empty($this->apiKey)) {
+            throw new \Exception('API Key is not set in the environment variables.');
+        }
     }
 
     public function register(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
-        $username = $data['username'] ?? '';
+        $firstName = $data['first_name'] ?? '';
+        $lastName = $data['last_name'] ?? '';
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
-        if (empty($username) || empty($email) || empty($password)) {
+        if (empty($firstName) || empty($lastName) || empty($email) || empty($password)) {
             return $this->respondWithJson($response, ['error' => 'All fields are required.'], 400);
         }
 
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
         try {
-            // Use RETURNING clause to get the inserted user's id and username
-            $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?) RETURNING id, username";
-            $result = $this->db->executeQuery($sql, [$username, $email, $hashedPassword]);
-
-            if (empty($result['results'][0]['response']['result']['rows'])) {
-                return $this->respondWithJson($response, ['error' => 'Registration failed.'], 500);
-            }
-
-            $userRow = $result['results'][0]['response']['result']['rows'][0];
-            // Extract id and username from the result
-            $userId = $userRow[0]['value'];
-            $username = $userRow[1]['value'];
-
-            // Generate JWT token for the new user
-            $token = $this->generateJWT([
-                'id' => $userId,
-                'username' => $username,
+            $res = $this->client->post('https://devlab.helioho.st/api/register.php', [
+                'form_params' => [
+                    'api_key' => $this->apiKey,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'password' => $password,
+                ]
             ]);
 
-            // Return the token in the response
-            return $this->respondWithJson($response, ['token' => $token], 201);
+            $body = json_decode($res->getBody(), true);
+            return $this->respondWithJson($response, $body, $res->getStatusCode());
+
         } catch (\Exception $e) {
-            // Handle duplicate entries or other database errors
-            if (strpos($e->getMessage(), 'UNIQUE constraint failed') !== false) {
-                return $this->respondWithJson($response, ['error' => 'Username or email already exists.'], 409);
-            }
             return $this->respondWithJson($response, ['error' => 'Registration failed.'], 500);
         }
     }
@@ -71,55 +55,28 @@ class UserController
     public function login(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
-        $username = $data['username'] ?? '';
+        $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
-        if (empty($username) || empty($password)) {
-            return $this->respondWithJson($response, ['error' => 'Username and password are required.'], 400);
+        if (empty($email) || empty($password)) {
+            return $this->respondWithJson($response, ['error' => 'Email and password are required.'], 400);
         }
 
         try {
-            $sql = "SELECT * FROM users WHERE username = ?";
-            $userResult = $this->db->executeQuery($sql, [$username]);
-
-            if (empty($userResult['results'][0]['response']['result']['rows'])) {
-                return $this->respondWithJson($response, ['error' => 'User not found'], 404);
-            }
-
-            $userRow = $userResult['results'][0]['response']['result']['rows'][0];
-            $hashedPassword = $userRow[3]['value'];
-
-            if (!password_verify($password, $hashedPassword)) {
-                return $this->respondWithJson($response, ['error' => 'Password does not match.'], 401);
-            }
-
-            $token = $this->generateJWT([
-                'id' => $userRow[0]['value'],
-                'username' => $userRow[1]['value'],
+            $res = $this->client->post('https://devlab.helioho.st/api/validate.php', [
+                'form_params' => [
+                    'api_key' => $this->apiKey,
+                    'email' => $email,
+                    'password' => $password,
+                ]
             ]);
-            return $this->respondWithJson($response, ['token' => $token]);
+
+            $body = json_decode($res->getBody(), true);
+            return $this->respondWithJson($response, $body, $res->getStatusCode());
 
         } catch (\Exception $e) {
             return $this->respondWithJson($response, ['error' => 'Login failed due to server error.'], 500);
         }
-    }
-
-    private function generateJWT(array $user): string
-    {
-        $now = new \DateTimeImmutable();
-        $expiry = $now->modify('+1 hour');
-
-        return $this->jwtConfig->builder()
-            ->issuedBy('Freshly-Backend')
-            ->permittedFor('your-application')
-            ->identifiedBy(bin2hex(random_bytes(16)))
-            ->issuedAt($now)
-            ->canOnlyBeUsedAfter($now)
-            ->expiresAt($expiry)
-            ->withClaim('uid', $user['id'])
-            ->withClaim('uname', $user['username'])
-            ->getToken($this->jwtConfig->signer(), $this->jwtConfig->signingKey())
-            ->toString();
     }
 
     private function respondWithJson(Response $response, array $data, int $status = 200): Response
