@@ -21,6 +21,7 @@ class UserController
         }
     }
 
+    // Register a new user
     public function register(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
@@ -34,7 +35,7 @@ class UserController
         }
 
         try {
-            $res = $this->client->post('https://devlab.helioho.st/api/register.php', [
+            $res = $this->client->post('http://pzf.22b.mytemp.website/api/register.php', [
                 'form_params' => [
                     'api_key' => $this->apiKey,
                     'first_name' => $firstName,
@@ -48,10 +49,12 @@ class UserController
             return $this->respondWithJson($response, $body, $res->getStatusCode());
 
         } catch (\Exception $e) {
+            error_log("Registration error: " . $e->getMessage());
             return $this->respondWithJson($response, ['error' => 'Registration failed.'], 500);
         }
     }
 
+    // Log in an existing user
     public function login(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
@@ -63,7 +66,7 @@ class UserController
         }
 
         try {
-            $res = $this->client->post('https://devlab.helioho.st/api/validate.php', [
+            $res = $this->client->post('http://pzf.22b.mytemp.website/api/validate.php', [
                 'form_params' => [
                     'api_key' => $this->apiKey,
                     'email' => $email,
@@ -75,10 +78,31 @@ class UserController
             return $this->respondWithJson($response, $body, $res->getStatusCode());
 
         } catch (\Exception $e) {
+            error_log("Login error: " . $e->getMessage());
             return $this->respondWithJson($response, ['error' => 'Login failed due to server error.'], 500);
         }
     }
 
+    // Fetch all users
+    public function listUsers(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $res = $this->client->post('http://pzf.22b.mytemp.website/api/listing.php', [
+                'form_params' => [
+                    'api_key' => $this->apiKey
+                ]
+            ]);
+
+            $body = json_decode($res->getBody(), true);
+            return $this->respondWithJson($response, $body, $res->getStatusCode());
+
+        } catch (\Exception $e) {
+            error_log("List Users error: " . $e->getMessage());
+            return $this->respondWithJson($response, ['error' => 'Failed to retrieve users.'], 500);
+        }
+    }
+
+    // Utility function to respond with JSON
     private function respondWithJson(Response $response, array $data, int $status = 200): Response
     {
         $response->getBody()->write(json_encode($data));
