@@ -1118,3 +1118,17 @@ Stack trace:
 #0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(35): App\Controllers\UserController->__construct()
 #1 {main}
   thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php on line 24
+[02-Dec-2024 09:00:56 UTC] PHP Fatal error:  Uncaught Exception: Database query failed: Client error: `POST https://freshly-seolyam.turso.io/v2/pipeline` resulted in a `401 Unauthorized` response:
+{"error":"Unauthorized: `The JWT is invalid`"}
+ in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/TursoClient.php:56
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/test_turso_client.php(14): App\TursoClient->executeQuery('SELECT * FROM p...')
+#1 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/TursoClient.php on line 56
+[02-Dec-2024 09:02:00 UTC] PHP Fatal error:  Uncaught Exception: Database query failed: Client error: `POST https://freshly-seolyam.turso.io/v2/pipeline` resulted in a `401 Unauthorized` response:
+{"error":"Unauthorized: `The JWT is invalid`"}
+ in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/TursoClient.php:56
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/test_turso_client.php(14): App\TursoClient->executeQuery('SELECT * FROM p...')
+#1 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/TursoClient.php on line 56
