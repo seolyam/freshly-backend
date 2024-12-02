@@ -19,7 +19,6 @@ class UserController
     {
         $this->client = new Client();
         $this->apiKey = $_ENV['USER_API_KEY'] ?? '';
-
         if (empty($this->apiKey)) {
             throw new \Exception('API Key is not set in the environment variables.');
         }
@@ -162,32 +161,69 @@ class UserController
 
     // Update User Profile
     public function updateProfile(Request $request, Response $response, array $args): Response
-    {
-        $userClaims = $request->getAttribute('user');
-        $email = $userClaims['email'] ?? null;
+{
+    $userClaims = $request->getAttribute('user');
+    $email = $userClaims['email'] ?? null;
 
-        if (!$email) {
-            return $this->respondWithJson($response, ['error' => 'User not found.'], 404);
-        }
-
-        $data = $request->getParsedBody();
-        $firstName = $data['first_name'] ?? '';
-        $lastName = $data['last_name'] ?? '';
-        $password = $data['password'] ?? '';
-
-        if (empty($firstName) || empty($lastName)) {
-            return $this->respondWithJson($response, ['error' => 'First name and last name are required.'], 400);
-        }
-
-        try {
-            // Assume the update is successful
-            return $this->respondWithJson($response, ['message' => 'Profile updated successfully.']);
-
-        } catch (\Exception $e) {
-            error_log('UpdateProfile Error: ' . $e->getMessage());
-            return $this->respondWithJson($response, ['error' => 'Failed to update profile.'], 500);
-        }
+    if (!$email) {
+        return $this->respondWithJson($response, ['error' => 'User not found.'], 404);
     }
+
+    $data = $request->getParsedBody();
+    $firstName = $data['first_name'] ?? '';
+    $middleInitial = $data['middle_initial'] ?? '';
+    $lastName = $data['last_name'] ?? '';
+    $birthdate = $data['birthdate'] ?? '';
+    $address = $data['address'] ?? '';
+    $password = $data['password'] ?? null;
+
+    if (empty($firstName) || empty($lastName)) {
+        return $this->respondWithJson($response, ['error' => 'First name and last name are required.'], 400);
+    }
+
+    try {
+        // Implement the logic to update the user's profile in your data store
+        // For example, send a request to the external API or update your database
+
+        // Sample code (needs to be adjusted based on your actual implementation)
+        $updateData = [
+            'api_key' => $this->apiKey,
+            'email' => $email,
+            'first_name' => $firstName,
+            'middle_initial' => $middleInitial,
+            'last_name' => $lastName,
+            'birthdate' => $birthdate,
+            'address' => $address,
+        ];
+
+        if ($password) {
+            $updateData['password'] = $password;
+        }
+
+        $res = $this->client->post('http://pzf.22b.mytemp.website/api/update_user.php', [
+            'form_params' => $updateData
+        ]);
+
+        $body = json_decode($res->getBody(), true);
+
+        if ($body['success'] ?? false) {
+            return $this->respondWithJson($response, [
+                'success' => true,
+                'message' => 'Profile updated successfully.',
+                'user' => $body['user'] // Assuming the API returns the updated user data
+            ], $res->getStatusCode());
+        } else {
+            return $this->respondWithJson($response, [
+                'success' => false,
+                'message' => $body['message'] ?? 'Failed to update profile.'
+            ], 400);
+        }
+
+    } catch (\Exception $e) {
+        error_log('UpdateProfile Error: ' . $e->getMessage());
+        return $this->respondWithJson($response, ['error' => 'Failed to update profile.'], 500);
+    }
+}
 
     private function respondWithJson(Response $response, array $data, int $status = 200): Response
     {

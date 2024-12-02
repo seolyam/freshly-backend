@@ -1086,3 +1086,35 @@ Stack trace:
 #0 {main}
   thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 18
 [01-Nov-2024 05:55:24 UTC] Token validation error: [{},"getProfile"] is not resolvable
+[25-Nov-2024 13:20:46 UTC] PHP Fatal error:  Uncaught Exception: Database URL or Auth Token is not set in the environment variables. in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php:20
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 20
+[25-Nov-2024 14:05:15 UTC] PHP Fatal error:  Uncaught Exception: Database URL or Auth Token is not set in the environment variables. in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php:20
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 20
+[25-Nov-2024 14:07:42 UTC] PHP Fatal error:  Uncaught Exception: Database URL or Auth Token is not set in the environment variables. in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php:20
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 20
+[25-Nov-2024 14:08:12 UTC] PHP Fatal error:  Uncaught Slim\Exception\HttpNotFoundException: Not found. in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/RoutingMiddleware.php:76
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Routing/RouteRunner.php(62): Slim\Middleware\RoutingMiddleware->performRouting(Object(Slim\Psr7\Request))
+#1 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/BodyParsingMiddleware.php(65): Slim\Routing\RouteRunner->handle(Object(Slim\Psr7\Request))
+#2 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(129): Slim\Middleware\BodyParsingMiddleware->process(Object(Slim\Psr7\Request), Object(Slim\Routing\RouteRunner))
+#3 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/MiddlewareDispatcher.php(73): Psr\Http\Server\RequestHandlerInterface@anonymous->handle(Object(Slim\Psr7\Request))
+#4 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(209): Slim\MiddlewareDispatcher->handle(Object(Slim\Psr7\Request))
+#5 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/App.php(193): Slim\App->handle(Object(Slim\Psr7\Request))
+#6 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(37): Slim\App->run()
+#7 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/vendor/slim/slim/Slim/Middleware/RoutingMiddleware.php on line 76
+[25-Nov-2024 14:12:58 UTC] PHP Fatal error:  Uncaught Exception: Database URL or Auth Token is not set in the environment variables. in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php:22
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php on line 22
+[25-Nov-2024 14:14:46 UTC] PHP Fatal error:  Uncaught Exception: API Key is not set in the environment variables. in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php:24
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/index.php(35): App\Controllers\UserController->__construct()
+#1 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/Controllers/UserController.php on line 24
