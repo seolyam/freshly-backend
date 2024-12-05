@@ -21,32 +21,32 @@ class ProductController
         try {
             $sql = 'SELECT * FROM products';
             $productResult = $this->db->executeQuery($sql);
-
+    
             if (empty($productResult['results'][0]['response']['result']['rows'])) {
                 return $this->respondWithJson($response, ['products' => []], 200);
             }
-
+    
             $rows = $productResult['results'][0]['response']['result']['rows'];
             $products = [];
-
+    
             foreach ($rows as $row) {
-                $product = [
-                    'id' => $row[0],
-                    'name' => $row[1],
-                    'description' => $row[2],
-                    'price' => $row[3],
-                    'image_url' => $row[4],
-                    'allergens' => $row[5],
+                $products[] = [
+                    'id' => $row[0]['value'], // Extract 'value' for each field
+                    'name' => $row[1]['value'],
+                    'description' => $row[2]['value'],
+                    'price' => $row[3]['value'],
+                    'image_url' => $row[4]['value'],
+                    'allergens' => $row[5]['value'],
                 ];
-                $products[] = $product;
             }
-
+    
             return $this->respondWithJson($response, ['products' => $products], 200);
         } catch (\Exception $e) {
             error_log('GetAllProducts Error: ' . $e->getMessage());
             return $this->respondWithJson($response, ['error' => 'Failed to fetch products.'], 500);
         }
     }
+    
 
     // Get Product by ID
     public function getProductById(Request $request, Response $response, array $args): Response
