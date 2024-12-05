@@ -51,5 +51,11 @@ $app->post('/profile', [$userController, 'updateProfile'])->add(new AuthMiddlewa
 
 $app->addErrorMiddleware(true, true, true);
 
-
+$app->get('/test-products', function ($request, $response) use ($tursoClient) {
+    $sql = 'SELECT * FROM products';
+    $productResult = $tursoClient->executeQuery($sql);
+    $response->getBody()->write(json_encode($productResult));
+    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+   });
+   
 $app->run();

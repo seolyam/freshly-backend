@@ -22,14 +22,29 @@ class ProductController
             $sql = 'SELECT * FROM products';
             $productResult = $this->db->executeQuery($sql);
 
-            // Extract products from result
-            $products = $productResult['results'][0]['rows'] ?? [];
+            if (empty($productResult['results'][0]['response']['result']['rows'])) {
+                return $this->respondWithJson($response, ['products' => []], 200);
+            }
 
-            $response->getBody()->write(json_encode(['products' => $products]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+            $rows = $productResult['results'][0]['response']['result']['rows'];
+            $products = [];
+
+            foreach ($rows as $row) {
+                $product = [
+                    'id' => $row[0]['value'],
+                    'name' => $row[1]['value'],
+                    'description' => $row[2]['value'],
+                    'price' => $row[3]['value'],
+                    'image_url' => $row[4]['value'],
+                    'allergens' => $row[5]['value'],
+                ];
+                $products[] = $product;
+            }
+
+            return $this->respondWithJson($response, ['products' => $products], 200);
         } catch (\Exception $e) {
             error_log('GetAllProducts Error: ' . $e->getMessage());
-            return $this->errorResponse($response, 'Failed to fetch products.');
+            return $this->respondWithJson($response, ['error' => 'Failed to fetch products.'], 500);
         }
     }
 
@@ -38,24 +53,32 @@ class ProductController
     {
         $productId = $args['id'] ?? null;
         if (!$productId) {
-            return $this->errorResponse($response, 'Product ID is required.', 400);
+            return $this->respondWithJson($response, ['error' => 'Product ID is required.'], 400);
         }
 
         try {
             $sql = 'SELECT * FROM products WHERE id = ?';
             $productResult = $this->db->executeQuery($sql, [$productId]);
 
-            $product = $productResult['results'][0]['rows'][0] ?? null;
-
-            if (!$product) {
-                return $this->errorResponse($response, 'Product not found', 404);
+            if (empty($productResult['results'][0]['response']['result']['rows'])) {
+                return $this->respondWithJson($response, ['error' => 'Product not found'], 404);
             }
 
-            $response->getBody()->write(json_encode(['product' => $product]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+            $row = $productResult['results'][0]['response']['result']['rows'][0];
+
+            $product = [
+                'id' => $row[0]['value'],
+                'name' => $row[1]['value'],
+                'description' => $row[2]['value'],
+                'price' => $row[3]['value'],
+                'image_url' => $row[4]['value'],
+                'allergens' => $row[5]['value'],
+            ];
+
+            return $this->respondWithJson($response, ['product' => $product], 200);
         } catch (\Exception $e) {
             error_log('GetProductById Error: ' . $e->getMessage());
-            return $this->errorResponse($response, 'Failed to fetch product.');
+            return $this->respondWithJson($response, ['error' => 'Failed to fetch product.'], 500);
         }
     }
 
@@ -67,19 +90,26 @@ class ProductController
         $description = $data['description'] ?? '';
         $price = $data['price'] ?? '';
         $imageUrl = $data['image_url'] ?? '';
+        $allergens = $data['allergens'] ?? '';
 
         if (empty($name) || empty($price) || empty($imageUrl)) {
-            return $this->errorResponse($response, 'Name, price, and image URL are required.', 400);
+            return $this->respondWithJson($response, ['error' => 'Name, price, and image URL are required.'], 400);
         }
 
         try {
-            $sql = 'INSERT INTO products (name, description, price, image_url) VALUES (?, ?, ?, ?)';
-            $this->db->executeQuery($sql, [$name, $description, $price, $imageUrl]);
+            $sql = 'INSERT INTO products (name, description, price, image_url, allergens) VALUES (?, ?, ?, ?, ?) RETURNING id';
+            $result = $this->db->executeQuery($sql, [$name, $description, $price, $imageUrl, $allergens]);
 
-            return $this->successResponse($response, 'Product created successfully.', 201);
+            if (empty($result['results'][0]['response']['result']['rows'])) {
+                return $this->respondWithJson($response, ['error' => 'Failed to create product.'], 500);
+            }
+
+            $productId = $result['results'][0]['response']['result']['rows'][0][0]['value'];
+
+            return $this->respondWithJson($response, ['message' => 'Product created successfully.', 'product_id' => $productId], 201);
         } catch (\Exception $e) {
             error_log('CreateProduct Error: ' . $e->getMessage());
-            return $this->errorResponse($response, 'Failed to create product.');
+            return $this->respondWithJson($response, ['error' => 'Failed to create product.'], 500);
         }
     }
 
@@ -88,48 +118,47 @@ class ProductController
     {
         $productId = $args['id'] ?? null;
         if (!$productId) {
-            return $this->errorResponse($response, 'Product ID is required.', 400);
+            return $this->respondWithJson($response, ['error' => 'Product ID is required.'], 400);
         }
 
         $data = $request->getParsedBody();
-        $name = $data['name'] ?? null;
-        $description = $data['description'] ?? null;
-        $price = $data['price'] ?? null;
-        $imageUrl = $data['image_url'] ?? null;
+        $fields = [];
+        $params = [];
 
-        if (!$name && !$description && !$price && !$imageUrl) {
-            return $this->errorResponse($response, 'At least one field is required to update.', 400);
+        if (isset($data['name'])) {
+            $fields[] = 'name = ?';
+            $params[] = $data['name'];
+        }
+        if (isset($data['description'])) {
+            $fields[] = 'description = ?';
+            $params[] = $data['description'];
+        }
+        if (isset($data['price'])) {
+            $fields[] = 'price = ?';
+            $params[] = $data['price'];
+        }
+        if (isset($data['image_url'])) {
+            $fields[] = 'image_url = ?';
+            $params[] = $data['image_url'];
+        }
+        if (isset($data['allergens'])) {
+            $fields[] = 'allergens = ?';
+            $params[] = $data['allergens'];
+        }
+
+        if (empty($fields)) {
+            return $this->respondWithJson($response, ['error' => 'At least one field is required to update.'], 400);
         }
 
         try {
-            $fields = [];
-            $params = [];
-
-            if ($name !== null) {
-                $fields[] = 'name = ?';
-                $params[] = $name;
-            }
-            if ($description !== null) {
-                $fields[] = 'description = ?';
-                $params[] = $description;
-            }
-            if ($price !== null) {
-                $fields[] = 'price = ?';
-                $params[] = $price;
-            }
-            if ($imageUrl !== null) {
-                $fields[] = 'image_url = ?';
-                $params[] = $imageUrl;
-            }
-
             $params[] = $productId;
             $sql = 'UPDATE products SET ' . implode(', ', $fields) . ' WHERE id = ?';
             $this->db->executeQuery($sql, $params);
 
-            return $this->successResponse($response, 'Product updated successfully.');
+            return $this->respondWithJson($response, ['message' => 'Product updated successfully.'], 200);
         } catch (\Exception $e) {
             error_log('UpdateProduct Error: ' . $e->getMessage());
-            return $this->errorResponse($response, 'Failed to update product.');
+            return $this->respondWithJson($response, ['error' => 'Failed to update product.'], 500);
         }
     }
 
@@ -138,30 +167,24 @@ class ProductController
     {
         $productId = $args['id'] ?? null;
         if (!$productId) {
-            return $this->errorResponse($response, 'Product ID is required.', 400);
+            return $this->respondWithJson($response, ['error' => 'Product ID is required.'], 400);
         }
 
         try {
             $sql = 'DELETE FROM products WHERE id = ?';
             $this->db->executeQuery($sql, [$productId]);
 
-            return $this->successResponse($response, 'Product deleted successfully.');
+            return $this->respondWithJson($response, ['message' => 'Product deleted successfully.'], 200);
         } catch (\Exception $e) {
             error_log('DeleteProduct Error: ' . $e->getMessage());
-            return $this->errorResponse($response, 'Failed to delete product.');
+            return $this->respondWithJson($response, ['error' => 'Failed to delete product.'], 500);
         }
     }
 
-    // Private helper methods
-    private function successResponse(Response $response, string $message, int $status = 200): Response
+    // Private helper method
+    private function respondWithJson(Response $response, array $data, int $status = 200): Response
     {
-        $response->getBody()->write(json_encode(['message' => $message]));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
-    }
-
-    private function errorResponse(Response $response, string $message, int $status = 500): Response
-    {
-        $response->getBody()->write(json_encode(['error' => $message]));
+        $response->getBody()->write(json_encode($data));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
 }

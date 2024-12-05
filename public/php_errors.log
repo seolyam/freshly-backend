@@ -1132,3 +1132,8 @@ Stack trace:
 #0 /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/test_turso_client.php(14): App\TursoClient->executeQuery('SELECT * FROM p...')
 #1 {main}
   thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/src/TursoClient.php on line 56
+[05-Dec-2024 13:57:00 UTC] PHP Warning:  require(path/to/TursoClient.php): Failed to open stream: No such file or directory in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/phptest.php on line 3
+[05-Dec-2024 13:57:00 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'path/to/TursoClient.php' (include_path='.:/usr/local/Cellar/php/8.3.13/share/php/pear') in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/phptest.php:3
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/freshly-backend/public/phptest.php on line 3
