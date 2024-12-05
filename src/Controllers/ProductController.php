@@ -31,12 +31,12 @@ class ProductController
 
             foreach ($rows as $row) {
                 $product = [
-                    'id' => $row[0]['value'],
-                    'name' => $row[1]['value'],
-                    'description' => $row[2]['value'],
-                    'price' => $row[3]['value'],
-                    'image_url' => $row[4]['value'],
-                    'allergens' => $row[5]['value'],
+                    'id' => $row[0],
+                    'name' => $row[1],
+                    'description' => $row[2],
+                    'price' => $row[3],
+                    'image_url' => $row[4],
+                    'allergens' => $row[5],
                 ];
                 $products[] = $product;
             }
@@ -67,12 +67,12 @@ class ProductController
             $row = $productResult['results'][0]['response']['result']['rows'][0];
 
             $product = [
-                'id' => $row[0]['value'],
-                'name' => $row[1]['value'],
-                'description' => $row[2]['value'],
-                'price' => $row[3]['value'],
-                'image_url' => $row[4]['value'],
-                'allergens' => $row[5]['value'],
+                'id' => $row[0],
+                'name' => $row[1],
+                'description' => $row[2],
+                'price' => $row[3],
+                'image_url' => $row[4],
+                'allergens' => $row[5],
             ];
 
             return $this->respondWithJson($response, ['product' => $product], 200);
@@ -104,7 +104,7 @@ class ProductController
                 return $this->respondWithJson($response, ['error' => 'Failed to create product.'], 500);
             }
 
-            $productId = $result['results'][0]['response']['result']['rows'][0][0]['value'];
+            $productId = $result['results'][0]['response']['result']['rows'][0][0];
 
             return $this->respondWithJson($response, ['message' => 'Product created successfully.', 'product_id' => $productId], 201);
         } catch (\Exception $e) {
