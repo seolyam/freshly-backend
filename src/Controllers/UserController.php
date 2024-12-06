@@ -15,6 +15,10 @@ class UserController
     private string $apiKey;
     private Configuration $jwtConfig;
 
+    // This static array simulates storage of external tokens keyed by email.
+    // In production, store this in a database.
+    private static array $externalTokens = [];
+
     public function __construct()
     {
         $this->client = new Client();
@@ -34,7 +38,6 @@ class UserController
         );
     }
 
-    // Register User
     public function register(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
@@ -81,7 +84,6 @@ class UserController
         }
     }
 
-    // User Login
     public function login(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
@@ -104,12 +106,19 @@ class UserController
             $body = json_decode($res->getBody(), true);
 
             if ($body['success'] ?? false) {
-                $token = $this->generateJwtToken($email);
+                // The professor's API token needed for future updates
+                $externalApiToken = $body['token'] ?? '';
+
+                // Store the external token associated with this user
+                $this->storeExternalApiToken($email, $externalApiToken);
+
+                // Generate your own JWT for your system
+                $jwtToken = $this->generateJwtToken($email);
 
                 return $this->respondWithJson($response, [
                     'success' => true,
                     'message' => 'User validated successfully.',
-                    'token' => $token
+                    'token' => $jwtToken
                 ], $res->getStatusCode());
             } else {
                 return $this->respondWithJson($response, [
@@ -124,8 +133,7 @@ class UserController
         }
     }
 
-    // Get User Profile
-    public function getProfile(Request $request, Response $response, array $args): Response
+    public function updateProfile(Request $request, Response $response, array $args): Response
     {
         $userClaims = $request->getAttribute('user');
         $email = $userClaims['email'] ?? null;
@@ -134,96 +142,80 @@ class UserController
             return $this->respondWithJson($response, ['error' => 'User not found.'], 404);
         }
 
+        $data = $request->getParsedBody();
+        $firstName = $data['first_name'] ?? '';
+        $middleInitial = $data['middle_initial'] ?? '';
+        $lastName = $data['last_name'] ?? '';
+        $birthdate = $data['birthdate'] ?? '';
+        $address = $data['address'] ?? '';
+        $password = $data['password'] ?? null;
+
+        if (empty($firstName) || empty($lastName)) {
+            return $this->respondWithJson($response, ['error' => 'First name and last name are required.'], 400);
+        }
+
         try {
-            $res = $this->client->post('http://pzf.22b.mytemp.website/api/listing.php', [
-                'form_params' => [
-                    'api_key' => $this->apiKey
-                ]
-            ]);
-
-            $users = json_decode($res->getBody(), true)['users'] ?? [];
-
-            $userData = array_filter($users, function($user) use ($email) {
-                return $user['email'] === $email;
-            });
-
-            if (empty($userData)) {
-                return $this->respondWithJson($response, ['error' => 'User not found.'], 404);
+            // Retrieve the previously stored professor's token
+            $externalApiToken = $this->getExternalApiToken($email);
+            if (empty($externalApiToken)) {
+                return $this->respondWithJson($response, [
+                    'success' => false,
+                    'message' => 'No external token found for user. User might not be properly authenticated with external API.'
+                ], 400);
             }
 
-            return $this->respondWithJson($response, array_values($userData)[0]);
+            $updateData = [
+                'api_key' => $this->apiKey,
+                'email' => $email,
+                'first_name' => $firstName,
+                'middle_initial' => $middleInitial,
+                'last_name' => $lastName,
+                'birthdate' => $birthdate,
+                'address' => $address,
+                'token' => $externalApiToken // Include the professor's token
+            ];
+
+            if ($password) {
+                $updateData['password'] = $password;
+            }
+
+            $res = $this->client->post('http://pzf.22b.mytemp.website/api/update_user.php', [
+                'form_params' => $updateData
+            ]);
+
+            $body = json_decode($res->getBody(), true);
+
+            if ($body['success'] ?? false) {
+                return $this->respondWithJson($response, [
+                    'success' => true,
+                    'message' => 'Profile updated successfully.',
+                    'user' => $body['user'] ?? null
+                ], $res->getStatusCode());
+            } else {
+                return $this->respondWithJson($response, [
+                    'success' => false,
+                    'message' => $body['message'] ?? 'Failed to update profile.'
+                ], 400);
+            }
 
         } catch (\Exception $e) {
-            error_log('GetProfile Error: ' . $e->getMessage());
-            return $this->respondWithJson($response, ['error' => 'Failed to fetch profile.'], 500);
+            error_log('UpdateProfile Error: ' . $e->getMessage());
+            return $this->respondWithJson($response, ['error' => 'Failed to update profile.'], 500);
         }
     }
 
-    // Update User Profile
-    public function updateProfile(Request $request, Response $response, array $args): Response
-{
-    $userClaims = $request->getAttribute('user');
-    $email = $userClaims['email'] ?? null;
-
-    if (!$email) {
-        return $this->respondWithJson($response, ['error' => 'User not found.'], 404);
+    private function storeExternalApiToken(string $email, string $externalApiToken): void
+    {
+        // Storing the token in a static array as an example.
+        // In production, store it in a database associated with the user.
+        self::$externalTokens[$email] = $externalApiToken;
     }
 
-    $data = $request->getParsedBody();
-    $firstName = $data['first_name'] ?? '';
-    $middleInitial = $data['middle_initial'] ?? '';
-    $lastName = $data['last_name'] ?? '';
-    $birthdate = $data['birthdate'] ?? '';
-    $address = $data['address'] ?? '';
-    $password = $data['password'] ?? null;
-
-    if (empty($firstName) || empty($lastName)) {
-        return $this->respondWithJson($response, ['error' => 'First name and last name are required.'], 400);
+    private function getExternalApiToken(string $email): string
+    {
+        // Retrieve the stored token from the static array. In production, retrieve from DB.
+        return self::$externalTokens[$email] ?? '';
     }
-
-    try {
-        // Implement the logic to update the user's profile in your data store
-        // For example, send a request to the external API or update your database
-
-        // Sample code (needs to be adjusted based on your actual implementation)
-        $updateData = [
-            'api_key' => $this->apiKey,
-            'email' => $email,
-            'first_name' => $firstName,
-            'middle_initial' => $middleInitial,
-            'last_name' => $lastName,
-            'birthdate' => $birthdate,
-            'address' => $address,
-        ];
-
-        if ($password) {
-            $updateData['password'] = $password;
-        }
-
-        $res = $this->client->post('http://pzf.22b.mytemp.website/api/update_user.php', [
-            'form_params' => $updateData
-        ]);
-
-        $body = json_decode($res->getBody(), true);
-
-        if ($body['success'] ?? false) {
-            return $this->respondWithJson($response, [
-                'success' => true,
-                'message' => 'Profile updated successfully.',
-                'user' => $body['user'] // Assuming the API returns the updated user data
-            ], $res->getStatusCode());
-        } else {
-            return $this->respondWithJson($response, [
-                'success' => false,
-                'message' => $body['message'] ?? 'Failed to update profile.'
-            ], 400);
-        }
-
-    } catch (\Exception $e) {
-        error_log('UpdateProfile Error: ' . $e->getMessage());
-        return $this->respondWithJson($response, ['error' => 'Failed to update profile.'], 500);
-    }
-}
 
     private function respondWithJson(Response $response, array $data, int $status = 200): Response
     {
@@ -235,7 +227,7 @@ class UserController
     {
         $now = new \DateTimeImmutable();
         $token = $this->jwtConfig->builder()
-            ->issuedBy('http://pzf.22b.mytemp.website/api/') // Replace with your domain
+            ->issuedBy('http://pzf.22b.mytemp.website/api/')
             ->issuedAt($now)
             ->expiresAt($now->modify('+1 hour'))
             ->withClaim('email', $email)
