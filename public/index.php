@@ -63,8 +63,12 @@ $app->group('/user', function ($group) use ($userController) {
 $app->group('/cart', function ($group) use ($cartController) {
     $group->post('', [$cartController, 'addCartItem'])->add(new AuthMiddleware());
     $group->post('/add', [$cartController, 'addCartItem'])->add(new AuthMiddleware());
+    $group->post('/update-quantity', [$cartController, 'updateCartItemQuantity'])->add(new AuthMiddleware());
     $group->get('', [$cartController, 'getCartItems'])->add(new AuthMiddleware());
 });
+
+// Checkout route
+$app->post('/checkout', [$cartController, 'checkout'])->add(new AuthMiddleware());
 
 // Extra user info route (for contactNumber, address, birthdate)
 $app->post('/update-user-info', [$userExtraController, 'updateUserInfo'])->add(new AuthMiddleware());
