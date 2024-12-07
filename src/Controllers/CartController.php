@@ -73,43 +73,47 @@ class CartController
 
     // Fetch all cart items for a user
     public function getCartItems(Request $request, Response $response, array $args): Response
-    {
-        // Retrieve user email from JWT claims set by AuthMiddleware
-        $userClaims = $request->getAttribute('user');
-        $email = $userClaims['email'] ?? null;
-    
-        if (!$email) {
-            return $this->respondWithJson($response, ['error' => 'User not authenticated'], 401);
-        }
-    
-        try {
-            $sql = 'SELECT ci.id, ci.productId, p.name, p.price, ci.quantity, p.imageUrl 
-                    FROM cartItems ci
-                    LEFT JOIN products p ON ci.productId = p.id
-                    WHERE ci.email = ?';
-            $cartItems = $this->db->executeQuery($sql, [$email]);
-    
-            if (!empty($cartItems['results'][0]['response']['result']['rows'])) {
-                $items = array_map(function ($row) {
-                    return [
-                        'id' => $row[0]['value'],
-                        'productId' => $row[1]['value'],
-                        'name' => $row[2]['value'] ?? 'Unknown',
-                        'price' => $row[3]['value'] ?? 0.0,
-                        'quantity' => $row[4]['value'],
-                        'imageUrl' => $row[5]['value'] ?? null,
-                    ];
-                }, $cartItems['results'][0]['response']['result']['rows']);
-    
-                return $this->respondWithJson($response, ['success' => true, 'cartItems' => $items], 200);
-            } else {
-                return $this->respondWithJson($response, ['success' => true, 'cartItems' => []], 200);
-            }
-        } catch (\Exception $e) {
-            error_log('GetCartItems Error: ' . $e->getMessage());
-            return $this->respondWithJson($response, ['error' => 'Failed to fetch cart items'], 500);
-        }
+{
+    $userClaims = $request->getAttribute('user');
+    $email = $userClaims['email'] ?? null;
+
+    if (!$email) {
+        return $this->respondWithJson($response, ['error' => 'User not authenticated'], 401);
     }
+
+    try {
+        $sql = 'SELECT ci.id, ci.productId, IFNULL(p.name, "Unknown") AS name, 
+               IFNULL(p.price, 0.0) AS price, ci.quantity, 
+               IFNULL(p.image_url, NULL) AS imageUrl
+        FROM cartItems ci
+        LEFT JOIN products p ON ci.productId = p.id
+        WHERE ci.email = ?';
+
+        
+        $cartItems = $this->db->executeQuery($sql, [$email]);
+
+        if (!empty($cartItems['results'][0]['response']['result']['rows'])) {
+            $items = array_map(function ($row) {
+                return [
+                    'id' => $row[0]['value'],
+                    'productId' => $row[1]['value'],
+                    'name' => $row[2]['value'],
+                    'price' => $row[3]['value'],
+                    'quantity' => $row[4]['value'],
+                    'imageUrl' => $row[5]['value'] ?? null,
+                ];
+            }, $cartItems['results'][0]['response']['result']['rows']);
+
+            return $this->respondWithJson($response, ['success' => true, 'cartItems' => $items], 200);
+        } else {
+            return $this->respondWithJson($response, ['success' => true, 'cartItems' => []], 200);
+        }
+    } catch (\Exception $e) {
+        error_log('GetCartItems Error: ' . $e->getMessage());
+        return $this->respondWithJson($response, ['error' => 'Failed to fetch cart items'], 500);
+    }
+}
+
     
 
     private function respondWithJson(Response $response, array $data, int $status = 200): Response
