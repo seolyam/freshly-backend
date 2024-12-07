@@ -6,6 +6,7 @@ use Slim\Factory\AppFactory;
 use App\Controllers\ProductController;
 use App\Controllers\UserController;
 use App\Controllers\UserExtraController;
+use App\Controllers\CartController;
 use App\Middleware\AuthMiddleware;
 use App\TursoClient;
 use App\Repository\UserExtraRepository;
@@ -47,6 +48,7 @@ $app->post('/register', [$userController, 'register']);
 $app->post('/login', [$userController, 'login']);
 $app->get('/profile', [$userController, 'getProfile'])->add(new AuthMiddleware());
 $app->post('/profile', [$userController, 'updateProfile'])->add(new AuthMiddleware());
+$app->post('/cart', [CartController::class, 'addCartItem'])->add(new AuthMiddleware());
 
 // Extra user info route (for contactNumber, address, birthdate)
 $app->post('/update-user-info', [$userExtraController, 'updateUserInfo'])->add(new AuthMiddleware());
