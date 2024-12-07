@@ -34,10 +34,10 @@ class TursoClient
                 ],
             ];
 
-            // Add parameters if any
+            // Convert all parameters to strings before sending
             if (!empty($params)) {
                 $requests[0]['stmt']['args'] = array_map(function ($param) {
-                    return ['type' => 'text', 'value' => $param];
+                    return ['type' => 'text', 'value' => (string)$param]; 
                 }, $params);
             }
 
