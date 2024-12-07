@@ -29,11 +29,14 @@ class UserExtraController
         $address = $data['address'] ?? '';
         $birthdate = $data['birthdate'] ?? '';
 
-        if (empty($contactNumber) || empty($address) || empty($birthdate)) {
+        if (empty($contactNumber) || empty($address)) {
             return $this->respondWithJson($response, [
-                'error' => 'Contact number, address, and birthdate are required.'
+                'error' => 'Contact number and address are required.'
             ], 400);
         }
+        
+        // If birthdate is optional, handle accordingly
+        
 
         // Update local Turso DB with the extra fields
         $this->extraRepo->upsertExtra($email, $contactNumber, $address, $birthdate);
