@@ -66,6 +66,7 @@ $app->group('/cart', function ($group) use ($cartController) {
     $group->post('/add', [$cartController, 'addCartItem'])->add(new AuthMiddleware());
     $group->post('/update-quantity', [$cartController, 'updateCartItemQuantity'])->add(new AuthMiddleware());
     $group->get('', [$cartController, 'getCartItems'])->add(new AuthMiddleware());
+    $group->delete('/clear', [$cartController, 'clearCart'])->add(new AuthMiddleware()); // Clear cart route
 });
 
 $app->post('/checkout', [$cartController, 'checkout'])->add(new AuthMiddleware());

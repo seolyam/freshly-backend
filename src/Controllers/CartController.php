@@ -68,6 +68,29 @@ class CartController
             return $this->respondWithJson($response, ['error' => 'Failed to add item to cart'], 500);
         }
     }
+    public function clearCart(Request $request, Response $response, array $args): Response
+    {
+        $userClaims = $request->getAttribute('user');
+        $email = $userClaims['email'] ?? null;
+
+        if (!$email) {
+            return $this->respondWithJson($response, ['error' => 'User not authenticated'], 401);
+        }
+
+        try {
+            // Delete all items from the user's cart
+            $deleteSql = 'DELETE FROM cartItems WHERE email = ?';
+            $this->db->executeQuery($deleteSql, [$email]);
+
+            return $this->respondWithJson($response, [
+                'success' => true,
+                'message' => 'Cart cleared successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            error_log('ClearCart Error: ' . $e->getMessage());
+            return $this->respondWithJson($response, ['error' => 'Failed to clear cart'], 500);
+        }
+    }
 
     // Update cart item quantity
     public function updateCartItemQuantity(Request $request, Response $response, array $args): Response
