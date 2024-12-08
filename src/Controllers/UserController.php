@@ -15,10 +15,6 @@ class UserController
     private string $apiKey;
     private Configuration $jwtConfig;
 
-    // This static array simulates storage of external tokens keyed by email.
-    // In production, store this in a database.
-    private static array $externalTokens = [];
-
     public function __construct()
     {
         $this->client = new Client();
@@ -106,15 +102,19 @@ class UserController
             $body = json_decode($res->getBody(), true);
 
             if ($body['success'] ?? false) {
-                // The professor's API doesn't return a token for updates.
-                // Just ignore external token since we decided not to update the professor's DB again.
-                // We'll still generate our own JWT.
                 $jwtToken = $this->generateJwtToken($email);
+                $refreshToken = bin2hex(random_bytes(32));
+
+                // Save the refresh token in the database (users table)
+                $updateSql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
+                $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
+                $db->executeQuery($updateSql, [$refreshToken, $email]);
 
                 return $this->respondWithJson($response, [
                     'success' => true,
                     'message' => 'User validated successfully.',
-                    'token' => $jwtToken
+                    'token' => $jwtToken,
+                    'refreshToken' => $refreshToken
                 ], $res->getStatusCode());
             } else {
                 return $this->respondWithJson($response, [
@@ -129,7 +129,37 @@ class UserController
         }
     }
 
-    // Removed updateProfile method since we no longer call update_user.php
+    public function refreshToken(Request $request, Response $response, array $args): Response
+    {
+        $data = $request->getParsedBody();
+        $refreshToken = $data['refreshToken'] ?? '';
+
+        if (empty($refreshToken)) {
+            return $this->respondWithJson($response, ['error' => 'Refresh token is required.'], 400);
+        }
+
+        try {
+            $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
+            $sql = 'SELECT email FROM users WHERE refresh_token = ?';
+            $result = $db->executeQuery($sql, [$refreshToken]);
+            $rows = $result['results'][0]['response']['result']['rows'] ?? [];
+
+            if (empty($rows)) {
+                return $this->respondWithJson($response, ['error' => 'Invalid refresh token.'], 401);
+            }
+
+            $email = $rows[0][0]['value'];
+            $newJwtToken = $this->generateJwtToken($email);
+
+            return $this->respondWithJson($response, [
+                'success' => true,
+                'token' => $newJwtToken
+            ], 200);
+        } catch (\Exception $e) {
+            error_log('RefreshToken Error: ' . $e->getMessage());
+            return $this->respondWithJson($response, ['error' => 'Failed to refresh token.'], 500);
+        }
+    }
 
     private function respondWithJson(Response $response, array $data, int $status = 200): Response
     {

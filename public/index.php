@@ -56,6 +56,7 @@ $app->group('/products', function ($group) use ($productController) {
 $app->group('/user', function ($group) use ($userController) {
     $group->post('/register', [$userController, 'register']);
     $group->post('/login', [$userController, 'login']);
+    $group->post('/refresh-token', [$userController, 'refreshToken']); // New route for token refresh
     $group->get('/profile', [$userController, 'getProfile'])->add(new AuthMiddleware());
     $group->post('/profile', [$userController, 'updateProfile'])->add(new AuthMiddleware());
 });
