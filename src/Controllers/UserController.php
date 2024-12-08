@@ -63,7 +63,6 @@ class UserController
                 $jwtToken = $this->generateJwtToken($email);
                 $refreshToken = bin2hex(random_bytes(32));
 
-                // Save the refresh token
                 $sql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
                 $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
                 $db->executeQuery($sql, [$refreshToken, $email]);
@@ -111,7 +110,6 @@ class UserController
                 $jwtToken = $this->generateJwtToken($email);
                 $refreshToken = bin2hex(random_bytes(32));
 
-                // Save the refresh token
                 $sql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
                 $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
                 $db->executeQuery($sql, [$refreshToken, $email]);
@@ -157,7 +155,6 @@ class UserController
             $newJwtToken = $this->generateJwtToken($email);
             $newRefreshToken = bin2hex(random_bytes(32));
 
-            // Update the refresh token
             $updateSql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
             $db->executeQuery($updateSql, [$newRefreshToken, $email]);
 
