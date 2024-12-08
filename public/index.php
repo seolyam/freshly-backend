@@ -7,7 +7,7 @@ use App\Controllers\ProductController;
 use App\Controllers\UserController;
 use App\Controllers\UserExtraController;
 use App\Controllers\CartController;
-use App\Controllers\OrderController; // NEW
+use App\Controllers\OrderController;
 use App\Middleware\AuthMiddleware;
 use App\TursoClient;
 use App\Repository\UserExtraRepository;
@@ -38,13 +38,13 @@ $app->addBodyParsingMiddleware();
 $productController = new ProductController($tursoClient);
 $userController = new UserController();
 $cartController = new CartController($tursoClient);
-$orderController = new OrderController($tursoClient); // NEW
+$orderController = new OrderController($tursoClient);
 
 // Instantiate UserExtraController
 $extraRepo = new UserExtraRepository($tursoClient);
 $userExtraController = new UserExtraController($extraRepo);
 
-// Products routes
+// Define routes
 $app->group('/products', function ($group) use ($productController) {
     $group->get('', [$productController, 'getAllProducts']);
     $group->get('/{id}', [$productController, 'getProductById']);
@@ -53,7 +53,6 @@ $app->group('/products', function ($group) use ($productController) {
     $group->delete('/{id}', [$productController, 'deleteProduct']);
 });
 
-// User routes
 $app->group('/user', function ($group) use ($userController) {
     $group->post('/register', [$userController, 'register']);
     $group->post('/login', [$userController, 'login']);
@@ -61,7 +60,6 @@ $app->group('/user', function ($group) use ($userController) {
     $group->post('/profile', [$userController, 'updateProfile'])->add(new AuthMiddleware());
 });
 
-// Cart routes
 $app->group('/cart', function ($group) use ($cartController) {
     $group->post('', [$cartController, 'addCartItem'])->add(new AuthMiddleware());
     $group->post('/add', [$cartController, 'addCartItem'])->add(new AuthMiddleware());
@@ -69,13 +67,8 @@ $app->group('/cart', function ($group) use ($cartController) {
     $group->get('', [$cartController, 'getCartItems'])->add(new AuthMiddleware());
 });
 
-// Checkout route
 $app->post('/checkout', [$cartController, 'checkout'])->add(new AuthMiddleware());
-
-// Orders route
 $app->get('/orders', [$orderController, 'getOrders'])->add(new AuthMiddleware());
-
-// Extra user info route (for contactNumber, address, birthdate)
 $app->post('/update-user-info', [$userExtraController, 'updateUserInfo'])->add(new AuthMiddleware());
 
 // Add error middleware for debugging
