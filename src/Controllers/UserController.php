@@ -60,20 +60,26 @@ class UserController
             $body = json_decode($res->getBody(), true);
 
             if ($body['success'] ?? false) {
-                $token = $this->generateJwtToken($email);
+                $jwtToken = $this->generateJwtToken($email);
+                $refreshToken = bin2hex(random_bytes(32));
+
+                // Save the refresh token
+                $sql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
+                $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
+                $db->executeQuery($sql, [$refreshToken, $email]);
 
                 return $this->respondWithJson($response, [
                     'success' => true,
                     'message' => 'User registered successfully.',
-                    'token' => $token
-                ], $res->getStatusCode());
+                    'token' => $jwtToken,
+                    'refreshToken' => $refreshToken
+                ], 200);
             } else {
                 return $this->respondWithJson($response, [
                     'success' => false,
                     'message' => $body['message'] ?? 'Registration failed.'
                 ], 400);
             }
-
         } catch (\Exception $e) {
             error_log('Registration Error: ' . $e->getMessage());
             return $this->respondWithJson($response, ['error' => 'Registration failed.'], 500);
@@ -105,42 +111,41 @@ class UserController
                 $jwtToken = $this->generateJwtToken($email);
                 $refreshToken = bin2hex(random_bytes(32));
 
-                // Save the refresh token in the database (users table)
-                $updateSql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
+                // Save the refresh token
+                $sql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
                 $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
-                $db->executeQuery($updateSql, [$refreshToken, $email]);
+                $db->executeQuery($sql, [$refreshToken, $email]);
 
                 return $this->respondWithJson($response, [
                     'success' => true,
                     'message' => 'User validated successfully.',
                     'token' => $jwtToken,
                     'refreshToken' => $refreshToken
-                ], $res->getStatusCode());
+                ], 200);
             } else {
                 return $this->respondWithJson($response, [
                     'success' => false,
                     'message' => $body['message'] ?? 'Invalid credentials.'
                 ], 401);
             }
-
         } catch (\Exception $e) {
             error_log('Login Error: ' . $e->getMessage());
-            return $this->respondWithJson($response, ['error' => 'Login failed due to server error.'], 500);
+            return $this->respondWithJson($response, ['error' => 'Login failed.'], 500);
         }
     }
 
     public function refreshToken(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
-        $refreshToken = $data['refreshToken'] ?? '';
+        $refreshToken = $data['refresh_token'] ?? '';
 
         if (empty($refreshToken)) {
             return $this->respondWithJson($response, ['error' => 'Refresh token is required.'], 400);
         }
 
         try {
-            $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
             $sql = 'SELECT email FROM users WHERE refresh_token = ?';
+            $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
             $result = $db->executeQuery($sql, [$refreshToken]);
             $rows = $result['results'][0]['response']['result']['rows'] ?? [];
 
@@ -150,13 +155,19 @@ class UserController
 
             $email = $rows[0][0]['value'];
             $newJwtToken = $this->generateJwtToken($email);
+            $newRefreshToken = bin2hex(random_bytes(32));
+
+            // Update the refresh token
+            $updateSql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
+            $db->executeQuery($updateSql, [$newRefreshToken, $email]);
 
             return $this->respondWithJson($response, [
                 'success' => true,
-                'token' => $newJwtToken
+                'token' => $newJwtToken,
+                'refreshToken' => $newRefreshToken
             ], 200);
         } catch (\Exception $e) {
-            error_log('RefreshToken Error: ' . $e->getMessage());
+            error_log('Refresh Token Error: ' . $e->getMessage());
             return $this->respondWithJson($response, ['error' => 'Failed to refresh token.'], 500);
         }
     }
@@ -170,13 +181,12 @@ class UserController
     private function generateJwtToken(string $email): string
     {
         $now = new \DateTimeImmutable();
-        $token = $this->jwtConfig->builder()
-            ->issuedBy('http://pzf.22b.mytemp.website/api/')
+        return $this->jwtConfig->builder()
+            ->issuedBy('https://freshly-backend-production.up.railway.app/')
             ->issuedAt($now)
             ->expiresAt($now->modify('+1 hour'))
             ->withClaim('email', $email)
-            ->getToken($this->jwtConfig->signer(), $this->jwtConfig->signingKey());
-
-        return $token->toString();
+            ->getToken($this->jwtConfig->signer(), $this->jwtConfig->signingKey())
+            ->toString();
     }
 }
