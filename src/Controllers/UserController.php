@@ -34,6 +34,64 @@ class UserController
         );
     }
 
+    public function login(Request $request, Response $response, array $args): Response
+    {
+        $data = $request->getParsedBody();
+        $email = $data['email'] ?? '';
+        $password = $data['password'] ?? '';
+
+        if (empty($email) || empty($password)) {
+            return $this->respondWithJson($response, ['error' => 'Email and password are required.'], 400);
+        }
+
+        try {
+            $res = $this->client->post('http://pzf.22b.mytemp.website/api/validate.php', [
+                'form_params' => [
+                    'api_key' => $this->apiKey,
+                    'email' => $email,
+                    'password' => $password,
+                ]
+            ]);
+
+            $body = json_decode($res->getBody(), true);
+
+            if ($body['success'] ?? false) {
+                $jwtToken = $this->generateJwtToken($email);
+                $refreshToken = bin2hex(random_bytes(32));
+
+                // Sync user in the local database
+                $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
+                $checkUserSql = 'SELECT email FROM users WHERE email = ?';
+                $result = $db->executeQuery($checkUserSql, [$email]);
+
+                if (empty($result['results'][0]['response']['result']['rows'])) {
+                    // Insert user into local DB
+                    $insertUserSql = 'INSERT INTO users (email, refresh_token) VALUES (?, ?)';
+                    $db->executeQuery($insertUserSql, [$email, $refreshToken]);
+                } else {
+                    // Update refresh token for existing user
+                    $updateTokenSql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
+                    $db->executeQuery($updateTokenSql, [$refreshToken, $email]);
+                }
+
+                return $this->respondWithJson($response, [
+                    'success' => true,
+                    'message' => 'User validated successfully.',
+                    'token' => $jwtToken,
+                    'refreshToken' => $refreshToken
+                ], 200);
+            } else {
+                return $this->respondWithJson($response, [
+                    'success' => false,
+                    'message' => $body['message'] ?? 'Invalid credentials.'
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            error_log('Login Error: ' . $e->getMessage());
+            return $this->respondWithJson($response, ['error' => 'Login failed.'], 500);
+        }
+    }
+
     public function register(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();
@@ -63,9 +121,20 @@ class UserController
                 $jwtToken = $this->generateJwtToken($email);
                 $refreshToken = bin2hex(random_bytes(32));
 
-                $sql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
+                // Sync user in the local database
                 $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
-                $db->executeQuery($sql, [$refreshToken, $email]);
+                $checkUserSql = 'SELECT email FROM users WHERE email = ?';
+                $result = $db->executeQuery($checkUserSql, [$email]);
+
+                if (empty($result['results'][0]['response']['result']['rows'])) {
+                    // Insert user into local DB
+                    $insertUserSql = 'INSERT INTO users (email, refresh_token) VALUES (?, ?)';
+                    $db->executeQuery($insertUserSql, [$email, $refreshToken]);
+                } else {
+                    // Update refresh token for existing user
+                    $updateTokenSql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
+                    $db->executeQuery($updateTokenSql, [$refreshToken, $email]);
+                }
 
                 return $this->respondWithJson($response, [
                     'success' => true,
@@ -82,53 +151,6 @@ class UserController
         } catch (\Exception $e) {
             error_log('Registration Error: ' . $e->getMessage());
             return $this->respondWithJson($response, ['error' => 'Registration failed.'], 500);
-        }
-    }
-
-    public function login(Request $request, Response $response, array $args): Response
-    {
-        $data = $request->getParsedBody();
-        $email = $data['email'] ?? '';
-        $password = $data['password'] ?? '';
-
-        if (empty($email) || empty($password)) {
-            return $this->respondWithJson($response, ['error' => 'Email and password are required.'], 400);
-        }
-
-        try {
-            $res = $this->client->post('http://pzf.22b.mytemp.website/api/validate.php', [
-                'form_params' => [
-                    'api_key' => $this->apiKey,
-                    'email' => $email,
-                    'password' => $password,
-                ]
-            ]);
-
-            $body = json_decode($res->getBody(), true);
-
-            if ($body['success'] ?? false) {
-                $jwtToken = $this->generateJwtToken($email);
-                $refreshToken = bin2hex(random_bytes(32));
-
-                $sql = 'UPDATE users SET refresh_token = ? WHERE email = ?';
-                $db = new \App\TursoClient($_ENV['TURSO_DB_URL'], $_ENV['TURSO_AUTH_TOKEN']);
-                $db->executeQuery($sql, [$refreshToken, $email]);
-
-                return $this->respondWithJson($response, [
-                    'success' => true,
-                    'message' => 'User validated successfully.',
-                    'token' => $jwtToken,
-                    'refreshToken' => $refreshToken
-                ], 200);
-            } else {
-                return $this->respondWithJson($response, [
-                    'success' => false,
-                    'message' => $body['message'] ?? 'Invalid credentials.'
-                ], 401);
-            }
-        } catch (\Exception $e) {
-            error_log('Login Error: ' . $e->getMessage());
-            return $this->respondWithJson($response, ['error' => 'Login failed.'], 500);
         }
     }
 
