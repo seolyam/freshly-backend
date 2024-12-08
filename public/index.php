@@ -7,6 +7,7 @@ use App\Controllers\ProductController;
 use App\Controllers\UserController;
 use App\Controllers\UserExtraController;
 use App\Controllers\CartController;
+use App\Controllers\OrderController; // NEW
 use App\Middleware\AuthMiddleware;
 use App\TursoClient;
 use App\Repository\UserExtraRepository;
@@ -37,6 +38,7 @@ $app->addBodyParsingMiddleware();
 $productController = new ProductController($tursoClient);
 $userController = new UserController();
 $cartController = new CartController($tursoClient);
+$orderController = new OrderController($tursoClient); // NEW
 
 // Instantiate UserExtraController
 $extraRepo = new UserExtraRepository($tursoClient);
@@ -69,6 +71,9 @@ $app->group('/cart', function ($group) use ($cartController) {
 
 // Checkout route
 $app->post('/checkout', [$cartController, 'checkout'])->add(new AuthMiddleware());
+
+// Orders route
+$app->get('/orders', [$orderController, 'getOrders'])->add(new AuthMiddleware());
 
 // Extra user info route (for contactNumber, address, birthdate)
 $app->post('/update-user-info', [$userExtraController, 'updateUserInfo'])->add(new AuthMiddleware());
